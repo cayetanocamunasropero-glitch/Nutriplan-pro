@@ -1,0 +1,215 @@
+Arroz blanco crudo|360|79|7|0.6|80|ración en crudo
+Arroz blanco cocido|130|28|2.7|0.3|200|plato
+Arroz integral crudo|352|72|7.5|2.7|80|ración en crudo
+Arroz integral cocido|123|26|2.7|1|200|plato
+Pasta seca cruda|356|72|12.5|1.5|80|ración en crudo
+Pasta cocida|158|31|5.8|0.9|200|plato
+Pasta integral cruda|340|64|13|2.5|80|ración en crudo
+Macarrones cocidos|158|31|5.8|0.9|200|plato
+Espaguetis cocidos|158|31|5.8|0.9|200|plato
+Cuscús crudo|360|72|12.5|1|70|ración en crudo
+Quinoa cruda|368|64|14|6|70|ración en crudo
+Quinoa cocida|120|21|4.4|1.9|185|plato
+Avena en copos|375|60|13.5|7|50|ración
+Harina de avena|375|60|13.5|7|40|ración
+Corn flakes|378|84|7|0.9|30|ración
+Cereales integrales de desayuno|360|70|10|3|40|ración
+Muesli|370|62|10|7|50|ración
+Granola|450|60|9|18|45|ración
+Pan blanco (barra)|265|51|9|3.2|60|trozo
+Pan integral|250|41|10|4|60|2 rebanadas
+Pan de molde blanco|265|48|8|4|30|rebanada
+Pan de molde integral|245|42|10|3.5|30|rebanada
+Pan de centeno|250|46|8.5|3|40|rebanada
+Tostadas de pan (biscotes)|400|72|12|6|10|unidad
+Tortilla de trigo (wrap)|310|52|8.5|7|60|unidad
+Pan de pita|275|56|9|1.2|60|unidad
+Tortitas de arroz|387|81|8|3|8|unidad
+Tortitas de maíz|380|80|8|3|8|unidad
+Patata cruda|77|17|2|0.1|200|unidad mediana
+Patata cocida|86|20|1.7|0.1|200|ración
+Patata asada|93|21|2.5|0.1|200|ración
+Patatas fritas caseras|250|33|3.4|12|150|ración
+Patatas fritas de bolsa|536|53|6.5|34|40|bolsa pequeña
+Boniato crudo|86|20|1.6|0.1|200|unidad
+Boniato asado|90|21|2|0.2|200|ración
+Maíz dulce en lata|86|16|3|1.2|80|ración
+Garbanzos cocidos|164|27|8.9|2.6|200|ración
+Lentejas cocidas|116|20|9|0.4|200|ración
+Alubias cocidas|127|23|8.7|0.5|200|ración
+Guisantes cocidos|84|16|5.4|0.2|150|ración
+Garbanzos secos|364|61|19|6|70|ración en crudo
+Lentejas secas|353|60|25|1.1|70|ración en crudo
+Edamame|121|9|12|5|100|ración
+Hummus|177|14|8|10|50|ración
+Pechuga de pollo cruda|110|0|23|1.5|150|filete
+Pechuga de pollo a la plancha|165|0|31|3.6|150|filete
+Muslo de pollo asado (sin piel)|209|0|26|11|120|unidad
+Pechuga de pavo cruda|105|0|24|1|150|filete
+Pechuga de pavo a la plancha|135|0|30|1.5|150|filete
+Fiambre de pavo|105|2|19|2|20|loncha
+Jamón cocido|120|1.5|19|4|20|loncha
+Jamón serrano|240|0|31|13|20|loncha
+Lomo embuchado|245|1|38|10|20|loncha
+Chorizo|455|2|24|39|30|ración
+Salchichón|430|1.5|26|36|30|ración
+Ternera magra cruda|130|0|21|5|150|filete
+Ternera a la plancha|190|0|29|8|150|filete
+Carne picada de ternera|215|0|19|15|150|ración
+Carne picada mixta|250|0|17|20|150|ración
+Hamburguesa de ternera|240|1|17|19|120|unidad
+Lomo de cerdo crudo|143|0|21|6.5|150|filete
+Lomo de cerdo a la plancha|200|0|29|9|150|filete
+Solomillo de cerdo|120|0|21|3.5|150|ración
+Costillas de cerdo|290|0|17|25|150|ración
+Salchichas frescas de pollo|180|2|15|12|60|unidad
+Salchichas tipo Frankfurt|275|2|12|25|50|unidad
+Bacon|400|1|14|38|20|loncha
+Cordero|250|0|17|20|150|ración
+Conejo|135|0|21|5.5|150|ración
+Huevo entero|143|0.7|12.6|9.5|60|1 unidad M
+Clara de huevo|52|0.7|11|0.2|33|1 clara
+Yema de huevo|322|3.6|16|27|17|1 yema
+Huevo frito|196|0.8|13.6|15|60|1 unidad
+Tortilla francesa|154|0.6|11|12|120|2 huevos
+Tortilla de patatas|190|14|6.5|12|150|ración
+Atún al natural (escurrido)|110|0|25|1|56|1 lata
+Atún en aceite (escurrido)|190|0|26|9|56|1 lata
+Salmón fresco|208|0|20|13|150|filete
+Salmón ahumado|180|0|22|10|50|ración
+Merluza|80|0|17|1.3|150|filete
+Bacalao fresco|82|0|18|0.7|150|filete
+Lubina|100|0|19|2.5|150|filete
+Dorada|110|0|20|3.5|150|filete
+Sardinas en lata (aceite)|210|0|25|12|80|lata
+Caballa en lata|200|0|20|13|80|lata
+Gambas cocidas|99|0.2|24|0.3|100|ración
+Mejillones cocidos|172|7|24|4.5|100|ración
+Calamar|92|3|16|1.4|150|ración
+Surimi (palitos de cangrejo)|95|14|7.5|0.5|50|4 palitos
+Leche entera|63|4.7|3.1|3.6|250|vaso
+Leche semidesnatada|46|4.8|3.2|1.6|250|vaso
+Leche desnatada|35|4.9|3.4|0.1|250|vaso
+Bebida de avena|45|7|1|1.5|250|vaso
+Bebida de soja|39|2.5|3.3|1.8|250|vaso
+Bebida de almendra|24|3|0.5|1.1|250|vaso
+Yogur natural|61|4.7|3.5|3.2|125|1 unidad
+Yogur natural desnatado|42|5.5|4.2|0.1|125|1 unidad
+Yogur griego natural|115|4|6|9|125|1 unidad
+Yogur griego 0%|59|3.6|10|0.4|125|1 unidad
+Yogur proteico (tipo +Proteínas)|60|4|10|0.2|120|1 unidad
+Yogur de sabores|90|13|3.3|2.7|125|1 unidad
+Kéfir|60|4|3.5|3.5|200|vaso
+Queso fresco batido 0%|46|3.5|8|0.2|250|tarrina
+Queso fresco tipo Burgos|180|3|12|13|60|ración
+Queso fresco tipo Burgos 0%|70|3|13|0.5|60|ración
+Requesón|100|3.5|11|4.5|100|ración
+Queso cottage|98|3.4|11|4.3|100|ración
+Mozzarella|255|1|18|20|60|ración
+Queso semicurado|375|0.5|25|30|30|ración
+Queso curado|430|0.5|30|34|30|ración
+Queso en lonchas (tipo sándwich)|300|5|17|24|20|loncha
+Queso light en lonchas|230|1|30|12|20|loncha
+Queso rallado|400|1|30|30|20|cucharada colmada
+Queso de untar|230|4|6|21|20|ración
+Queso de untar light|140|6|8|9|20|ración
+Mantequilla|740|0.6|0.7|82|10|ración
+Nata para cocinar|195|3.5|2.5|19|50|ración
+Proteína whey (polvo)|380|7|78|5|30|cacito
+Caseína (polvo)|360|8|80|1.5|30|cacito
+Batido de proteínas listo para beber|65|3|11|1|330|botella
+Barrita de proteínas|360|35|30|12|60|unidad
+Aceite de oliva|884|0|0|100|10|cucharada
+Aceite de girasol|884|0|0|100|10|cucharada
+Mayonesa|680|1|1|75|15|cucharada
+Mayonesa light|300|8|1|30|15|cucharada
+Ketchup|105|24|1.2|0.2|15|cucharada
+Mostaza|66|5|4|3.5|10|cucharadita
+Tomate frito|85|11|1.5|4|50|ración
+Salsa boloñesa|90|7|5|5|90|ración
+Pesto|450|6|5|45|20|cucharada
+Salsa de soja|60|5|8|0.1|10|cucharada
+Almendras|579|22|21|50|30|puñado
+Nueces|654|14|15|65|30|puñado
+Cacahuetes tostados|585|21|24|50|30|puñado
+Anacardos|553|30|18|44|30|puñado
+Pistachos|560|28|20|45|30|puñado
+Crema de cacahuete|590|20|25|50|15|cucharada
+Semillas de chía|486|42|17|31|15|cucharada
+Semillas de lino|534|29|18|42|15|cucharada
+Aguacate|160|8.5|2|14.7|100|medio
+Aceitunas verdes|145|4|1|15|30|ración
+Plátano|89|23|1.1|0.3|120|1 unidad
+Manzana|52|14|0.3|0.2|180|1 unidad
+Pera|57|15|0.4|0.1|170|1 unidad
+Naranja|47|12|0.9|0.1|180|1 unidad
+Mandarina|53|13|0.8|0.3|80|1 unidad
+Kiwi|61|15|1.1|0.5|75|1 unidad
+Fresas|32|7.7|0.7|0.3|150|ración
+Arándanos|57|14|0.7|0.3|100|ración
+Uvas|69|18|0.7|0.2|150|racimo pequeño
+Piña|50|13|0.5|0.1|150|2 rodajas
+Melón|34|8|0.8|0.2|200|tajada
+Sandía|30|7.6|0.6|0.2|250|tajada
+Melocotón|39|10|0.9|0.3|150|1 unidad
+Mango|60|15|0.8|0.4|150|ración
+Cerezas|63|16|1.1|0.2|100|ración
+Dátiles|282|75|2.5|0.4|8|1 unidad
+Pasas|299|79|3|0.5|30|puñado
+Frutos rojos congelados|45|9|1|0.4|100|ración
+Zumo de naranja natural|45|10|0.7|0.2|200|vaso
+Zumo envasado|45|10.5|0.4|0.1|200|vaso
+Compota de manzana|70|17|0.3|0.2|100|tarrina
+Tomate|18|3.9|0.9|0.2|150|1 unidad
+Lechuga|15|2.9|1.4|0.2|80|ración
+Ensalada mezcla (bolsa)|17|2.5|1.5|0.2|80|ración
+Espinacas|23|3.6|2.9|0.4|100|ración
+Brócoli|34|7|2.8|0.4|150|ración
+Coliflor|25|5|1.9|0.3|150|ración
+Judías verdes|31|7|1.8|0.2|150|ración
+Calabacín|17|3.1|1.2|0.3|200|1 unidad
+Berenjena|25|6|1|0.2|200|1 unidad
+Pimiento rojo|31|6|1|0.3|150|1 unidad
+Pimiento verde|20|4.6|0.9|0.2|150|1 unidad
+Cebolla|40|9|1.1|0.1|100|1 unidad
+Zanahoria|41|10|0.9|0.2|80|1 unidad
+Pepino|15|3.6|0.7|0.1|150|ración
+Champiñones|22|3.3|3.1|0.3|100|ración
+Espárragos|20|3.9|2.2|0.1|100|ración
+Alcachofa|47|10.5|3.3|0.2|120|ración
+Verduras para wok (congeladas)|35|6|2|0.3|150|ración
+Gazpacho|40|4.5|0.8|2|250|vaso
+Chocolate negro 85%|600|20|11|52|20|2 onzas
+Chocolate con leche|535|57|8|30|20|2 onzas
+Galletas tipo María|440|74|7|12|8|1 unidad
+Galletas de chocolate|490|65|6|23|12|1 unidad
+Miel|304|82|0.3|0|10|cucharadita
+Mermelada|250|62|0.4|0.1|15|cucharada
+Mermelada sin azúcar|150|37|0.5|0.1|15|cucharada
+Azúcar|400|100|0|0|5|sobre
+Cacao soluble azucarado|380|80|5|3.5|15|cucharada
+Cacao puro en polvo|360|12|23|22|10|cucharada
+Bollería (cruasán)|420|45|8|23|60|unidad
+Magdalena|450|52|6|24|30|unidad
+Helado|210|25|3.5|11|100|bola
+Pizza (casera/precocinada)|265|33|11|10|150|2 porciones
+Base de pizza|290|55|8|4|140|base
+Hamburguesa completa (restaurante)|255|25|13|12|220|unidad
+Kebab|215|18|13|10|300|unidad
+Sushi (variado)|145|25|5|2.5|200|8 piezas
+Croquetas|240|20|7|15|30|unidad
+Lasaña|135|12|7|7|300|ración
+Paella|160|21|7|5|300|plato
+Cocido (garbanzos y carne)|150|10|11|7|400|plato
+Lentejas con chorizo|135|13|8|5.5|350|plato
+Ensaladilla rusa|170|9|3.5|13|150|ración
+Patatas bravas|230|25|3|13|150|ración
+Cerveza|43|3.6|0.5|0|330|caña/lata
+Cerveza sin alcohol|26|5.5|0.3|0|330|lata
+Vino tinto|85|2.6|0.1|0|150|copa
+Refresco de cola|42|10.6|0|0|330|lata
+Refresco zero|1|0|0|0|330|lata
+Bebida isotónica|25|6|0|0|500|botella
+Café solo|2|0|0.1|0|60|taza
+Café con leche (semidesnatada)|30|2.8|2|1|200|taza
+Cacao a la taza / Colacao con leche|80|11|3.5|2.4|250|vaso

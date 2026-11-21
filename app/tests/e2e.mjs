@@ -1,0 +1,235 @@
+// Prueba de extremo a extremo con Supabase simulado.
+// Uso: npm run build && node tests/e2e.mjs [carpeta_capturas]
+import { chromium } from 'playwright';
+import { spawn } from 'node:child_process';
+import { mkdirSync } from 'node:fs';
+import { CLIENT_UID, OWNER, install, seed } from './mock.mjs';
+
+const OUT = process.argv[2] || 'tests/shots';
+mkdirSync(OUT, { recursive: true });
+const PORT = 4179;
+const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { stdio: 'pipe' });
+await new Promise((r) => server.stdout.on('data', (d) => /Local/.test(String(d)) && r()));
+process.on('exit', () => server.kill());
+process.on('unhandledRejection', (e) => { console.error(e); server.kill(); process.exit(1); });
+process.on('uncaughtException', (e) => { console.error(e); server.kill(); process.exit(1); });
+const BASE = `http://localhost:${PORT}/`;
+
+const browser = await chromium.launch();
+let failures = 0;
+const ok = (cond, label) => {
+  console.log((cond ? '✓ ' : '✗ ') + label);
+  if (!cond) failures++;
+};
+
+async function ctx(theme = 'light') {
+  const c = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, colorScheme: theme, locale: 'es-ES', hasTouch: true });
+  const p = await c.newPage();
+  p.on('pageerror', (e) => {
+    console.log('PAGE ERROR', e.message);
+    failures++;
+  });
+  return { c, p };
+}
+
+async function login(p, email) {
+  await p.goto(BASE);
+  await p.getByPlaceholder('tu@correo.com').fill(email);
+  await p.getByPlaceholder('••••••••').fill('secreto123');
+  await p.getByRole('button', { name: 'Entrar' }).click();
+}
+
+// ---------- 1. Cliente con plan: registrar comida, agua, plan, peso ----------
+{
+  const db = seed();
+  const { c, p } = await ctx();
+  const writes = await install(p, db, { uid: CLIENT_UID });
+  await p.goto(BASE);
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: `${OUT}/01-login.png` });
+  await login(p, 'cliente@example.com');
+  await p.getByText('kcal restantes').waitFor();
+  ok(await p.getByRole('heading', { name: 'Mario' }).isVisible(), 'saludo con el nombre del cuestionario');
+  await p.waitForTimeout(700);
+  await p.screenshot({ path: `${OUT}/02-hoy-vacio.png` });
+
+  // Añadir desde la biblioteca
+  await p.getByRole('button', { name: 'Añadir a Comida' }).click();
+  await p.getByPlaceholder('Busca: pollo, avena, yogur…').fill('arroz blanco cocido');
+  await p.waitForTimeout(600);
+  await p.screenshot({ path: `${OUT}/03-buscar.png` });
+  await p.getByRole('button', { name: /Arroz blanco cocido/ }).first().click();
+  await p.getByLabel('Cantidad en g').fill('200');
+  await p.waitForTimeout(300);
+  await p.screenshot({ path: `${OUT}/04-cantidad.png` });
+  await p.getByRole('button', { name: 'Añadir', exact: true }).click();
+  // Añadir desde el catálogo externo
+  await p.getByPlaceholder('Busca: pollo, avena, yogur…').fill('pechuga lonchas');
+  await p.getByRole('button', { name: /Pechuga de pollo en lonchas/ }).click();
+  await p.getByLabel('Cantidad en g').fill('100');
+  await p.getByRole('button', { name: 'Añadir', exact: true }).click();
+  await p.getByRole('button', { name: /Listo · 2 alimentos/ }).click();
+  await p.waitForTimeout(900);
+  const todayIso = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const L = () => db.nutriplan_meal_logs.find((l) => l.log_date === todayIso);
+  let log = L();
+  ok(log && log.entries.length === 2, 'dos alimentos guardados en nutriplan_meal_logs');
+  ok(log && log.entries.every((e) => e.freeEntry && e.mealSlot === 'Comida' && e.items[0].grams > 0), 'formato de entrada compatible (freeEntry/mealSlot/items)');
+  // 260 kcal arroz + 98 pollo = 358
+  ok(await p.getByText('358 / 2300').isVisible(), 'anillo muestra 358 / 2300 kcal');
+
+  // Agua
+  await p.getByRole('button', { name: 'Añadir 250 ml' }).click();
+  await p.getByRole('button', { name: 'Añadir 250 ml' }).click();
+  await p.waitForTimeout(700);
+  log = L();
+  ok(log && log.water_ml === 500, 'agua 500 ml guardada');
+  await p.screenshot({ path: `${OUT}/05-hoy-con-comida.png`, fullPage: true });
+
+  // Editar y borrar con deshacer
+  await p.getByRole('button', { name: /Pechuga de pollo en lonchas/ }).click();
+  await p.getByRole('button', { name: 'Quitar de este día' }).click();
+  await p.waitForTimeout(600);
+  log = L();
+  ok(log.entries.length === 1, 'borrar alimento');
+  await p.getByRole('button', { name: 'Deshacer' }).last().click();
+  await p.waitForTimeout(700);
+  log = L();
+  ok(log.entries.length === 2, 'deshacer borrado');
+
+  // Repetir ayer
+  await p.getByRole('button', { name: 'Repetir ayer' }).first().click();
+  await p.waitForTimeout(700);
+  log = L();
+  ok(log.entries.length === 3, 'repetir cena de ayer');
+
+  // Plan
+  await p.getByRole('button', { name: 'Mi plan', exact: true }).click();
+  await p.getByRole('heading', { name: 'Mi plan' }).waitFor();
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: `${OUT}/06-plan.png`, fullPage: true });
+  await p.getByRole('button', { name: 'B', exact: true }).click();
+  await p.getByRole('button', { name: 'Registrar' }).first().click();
+  await p.waitForTimeout(800);
+  log = L();
+  const planEntry = log.entries.find((e) => e.meal === 'Desayuno' && !e.freeEntry);
+  ok(planEntry && planEntry.letter === 'B' && planEntry.items.length === 2, 'opción B del desayuno registrada con formato del plan');
+
+  // Progreso
+  await p.getByRole('button', { name: 'Progreso', exact: true }).click();
+  await p.getByRole('heading', { name: 'Progreso' }).waitFor();
+  await p.waitForTimeout(900);
+  await p.screenshot({ path: `${OUT}/07-progreso.png`, fullPage: true });
+  await p.getByRole('button', { name: 'Peso' }).first().click();
+  await p.getByPlaceholder('00,0').fill('84,6');
+  await p.getByRole('button', { name: 'Guardar' }).click();
+  await p.waitForTimeout(600);
+  ok(db.nutriplan_weight_entries.some((w) => +w.weight_kg === 84.6), 'peso guardado');
+
+  // Botón atrás de Android
+  const handled = await p.evaluate(() => window.npBack && window.npBack());
+  ok(handled === true, 'window.npBack vuelve a «Hoy»');
+  await p.getByRole('button', { name: 'Yo', exact: true }).click();
+  await p.waitForTimeout(300);
+  await p.screenshot({ path: `${OUT}/08-yo.png` });
+  ok(!writes.some((w) => w.table === 'nutriplan_private_store'), 'el cliente nunca escribe en la ficha privada del coach');
+  await c.close();
+}
+
+// ---------- 2. Cliente nuevo: código de WhatsApp + cuestionario (modo oscuro) ----------
+{
+  const db = seed({ linked: false });
+  const { c, p } = await ctx('dark');
+  await install(p, db, { uid: CLIENT_UID });
+  await login(p, 'cliente@example.com');
+  await p.getByText('Activa tu acceso').waitFor();
+  await p.getByPlaceholder('NP-XXXX-XXXX').fill('NP-ABCD-EFGH-JKLM-NPQR');
+  await p.screenshot({ path: `${OUT}/09-codigo-oscuro.png` });
+  await p.getByRole('button', { name: 'Activar' }).click();
+  await p.getByText('Antes de empezar').waitFor();
+  await p.getByPlaceholder('Tu nombre').fill('Mario');
+  await p.getByPlaceholder('Tus apellidos').fill('Prueba');
+  await p.screenshot({ path: `${OUT}/10-cuestionario-oscuro.png` });
+  for (let i = 0; i < 3; i++) await p.getByRole('button', { name: 'Continuar' }).click();
+  await p.getByRole('button', { name: 'Empezar' }).click();
+  await p.getByText('kcal restantes').waitFor();
+  ok(db.nutriplan_client_onboarding[0]?.completed_at, 'cuestionario guardado y completado');
+  await p.waitForTimeout(700);
+  await p.screenshot({ path: `${OUT}/11-hoy-oscuro.png` });
+  await c.close();
+}
+
+// ---------- 3. Coach: panel, detalle, ficha, acceso ----------
+for (const [w, h, tag] of [
+  [390, 844, 'movil'],
+  [1366, 900, 'escritorio'],
+]) {
+  const db = seed();
+  const c = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, locale: 'es-ES' });
+  const p = await c.newPage();
+  p.on('pageerror', (e) => {
+    console.log('PAGE ERROR', e.message);
+    failures++;
+  });
+  const writes = await install(p, db, { uid: OWNER });
+  await login(p, 'coach@example.com');
+  await p.getByText('NutriPlan Coach').waitFor();
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: `${OUT}/20-coach-panel-${tag}.png` });
+  await p.getByRole('button', { name: /Mario Prueba/ }).click();
+  await p.getByText('Calorías · 14 días').waitFor();
+  await p.waitForTimeout(800);
+  await p.screenshot({ path: `${OUT}/21-coach-resumen-${tag}.png`, fullPage: true });
+  await p.getByRole('button', { name: 'Diario', exact: true }).click();
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: `${OUT}/22-coach-diario-${tag}.png` });
+  await p.getByRole('button', { name: 'Plan', exact: true }).click();
+  await p.waitForTimeout(300);
+  await p.screenshot({ path: `${OUT}/23-coach-plan-${tag}.png`, fullPage: true });
+  await p.getByRole('button', { name: 'Ficha', exact: true }).click();
+  await p.waitForTimeout(300);
+  await p.screenshot({ path: `${OUT}/24-coach-ficha-${tag}.png`, fullPage: true });
+  if (tag === 'movil') {
+    const weight = p.locator('label', { hasText: 'Peso' }).locator('input');
+    await weight.fill('80');
+    await p.getByRole('button', { name: 'Guardar ficha' }).click();
+    await p.waitForTimeout(500);
+    const pay = db.nutriplan_private_store[0].payload;
+    ok(pay.clients[0].weight === '80', 'ficha guardada en private_store');
+    ok(pay.legacyFieldKeep === 'no-borrar' && pay.clients.length === 3, 'se conservan los demás datos del coach');
+    p.once('dialog', (d) => d.accept());
+    await p.getByRole('button', { name: 'Enviar objetivo a su app' }).click();
+    await p.waitForTimeout(600);
+    const t = db.nutriplan_published_plans[0].content.target;
+    ok(t.kcal > 1500 && t.kcal < 3500 && db.nutriplan_published_plans[0].content.groups.length === 3, 'objetivo enviado sin perder el plan (' + t.kcal + ' kcal)');
+    // Invitación para Pablo (sin acceso)
+    await p.goto(BASE);
+    await p.getByRole('button', { name: /Pablo Ruiz/ }).click();
+    await p.getByRole('button', { name: 'Acceso', exact: true }).click();
+    await p.getByRole('button', { name: 'Generar código' }).click();
+    await p.getByText(/^NP-/).waitFor();
+    await p.screenshot({ path: `${OUT}/25-coach-acceso-${tag}.png` });
+    ok(db.nutriplan_invitations.length === 1 && /^[0-9a-f]{64}$/.test(db.nutriplan_invitations[0].token_hash), 'invitación guardada con hash');
+    ok(db.nutriplan_published_plans.some((x) => x.client_id === 'c-pablo' && x.content.diaryOnly && x.content.target.kcal > 0), 'plan solo-diario con objetivo calculado');
+    ok(!writes.some((x) => x.table === 'nutriplan_meal_logs'), 'el coach no modifica registros del cliente');
+    // Importar PDF (opcional: PDF=/ruta/al.pdf, no se suben PDFs reales al repositorio)
+    if (process.env.PDF) {
+      await p.getByRole('button', { name: 'Plan', exact: true }).click();
+      await p.locator('input[type=file]').setInputFiles(process.env.PDF);
+      await p.getByText('Objetivo diario').waitFor({ timeout: 30000 });
+      ok(await p.getByText('Macros completos').isVisible(), 'PDF importado con macros completos');
+      await p.screenshot({ path: `${OUT}/26-coach-pdf-${tag}.png` });
+      p.once('dialog', (d) => d.accept());
+      await p.getByRole('button', { name: /Publicar para/ }).click();
+      await p.waitForTimeout(800);
+      const pub = db.nutriplan_published_plans.find((x) => x.client_id === 'c-pablo');
+      ok(pub.content.groups.length >= 1 && pub.content.planType === 'alternative-tracker-v1' && db.nutriplan_diet_drafts.length === 1, 'dieta del PDF publicada (' + pub.content.groups.length + ' comidas)');
+    }
+  }
+  await c.close();
+}
+
+await browser.close();
+server.kill();
+console.log(failures ? `\n${failures} fallos` : '\nTodo OK');
+process.exit(failures ? 1 : 0);

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vercel/
+app/tests/shots/
+# PDFs reales de clientes: datos de salud, nunca al repositorio (es público)
+legacy/pdf_pruebas/
+*.pem
+.env*

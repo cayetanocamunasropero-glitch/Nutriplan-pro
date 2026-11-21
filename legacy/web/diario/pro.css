@@ -1,0 +1,52 @@
+/* NutriPlan · aspecto Pro (Bricolage Grotesque + Instrument Sans, verde profundo, modo oscuro) */
+:root{
+ --green:#1E5B49;--green-deep:#12302A;--green-mid:#2E7560;--pale:#DCEAE3;--line:#D3DED8;--grey:#5B6E68;--bg:#EBF0ED;
+ --orange:#D3961B;--yellow:#F2C14E;--np-ink:#12302A;--np-subtle:#5B6E68;--np-white:#fff;
+ --pro-surface:#FFFFFF;--pro-surface-2:#F5F8F6;--pro-carb:#D3961B;--pro-prot:#B23A5E;--pro-fat:#6E8A33;--pro-danger:#B4432F;
+ --np-shadow:0 1px 0 rgba(18,48,42,.04),0 10px 30px -18px rgba(18,48,42,.35);--np-radius:22px;
+}
+:root[data-theme=dark]{
+ --green:#5FBF98;--green-deep:#E6EFEA;--green-mid:#7FD0AE;--pale:#1F3A30;--line:#2A3D36;--grey:#97ABA3;--bg:#101B18;
+ --np-ink:#E6EFEA;--np-subtle:#97ABA3;--np-white:#17251F;--pro-surface:#17251F;--pro-surface-2:#1C2D27;
+ --pro-carb:#E8B04A;--pro-prot:#E0708F;--pro-fat:#A3C25E;--pro-danger:#E9775F;--orange:#E8B04A;color-scheme:dark;
+}
+body{background:var(--bg)!important;color:var(--np-ink)!important;font-family:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important}
+body,button,input,textarea,select{font-family:"Instrument Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important}
+h1,h2,h3,h4,.brand,.authTitle,.npd-date b,.npd-ring-in strong,.npd-meal-head h3,.npd-cdate{font-family:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif!important;letter-spacing:-.02em}
+h2,h3,.card h2{color:var(--green-deep)}
+header{background:color-mix(in srgb,var(--pro-surface) 92%,transparent)!important;border-bottom:1px solid var(--line)!important}
+.brand{color:var(--green-deep)!important}.brand small{color:var(--np-subtle)!important}
+.card,.meal-card,.trk-box,.npd-card,.np-ring-wrap,.np-macro-stack,.npd-cday{background:var(--pro-surface)!important;border-color:var(--line)!important;box-shadow:var(--np-shadow)!important;border-radius:var(--np-radius)}
+.item,.kpi,.trk-item,.lookup-choice,.np-option,.npd-hit{background:var(--pro-surface-2)!important;border-color:var(--line)!important;color:var(--np-ink)!important}
+.item.active,.total,.npd-preview,.np-ring-side>div{background:var(--pale)!important;color:var(--np-ink)!important}
+input,select,textarea{background:var(--pro-surface)!important;color:var(--np-ink)!important;border-color:var(--line)!important}
+input:focus,select:focus,textarea:focus{border-color:var(--green)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 22%,transparent)!important}
+label,.npd-grid label{color:var(--np-subtle)!important}
+.small,.muted,.npd-sub,.npd-hint,.npd-food small,.npd-hit small{color:var(--np-subtle)!important}
+button{background:var(--green);color:#fff;border-radius:12px}
+:root[data-theme=dark] button{color:#0D1F19}
+.soft,.ghost,.tab,.npd-chips button,.npd-x,#logout{background:var(--pale)!important;color:var(--green)!important;border-color:var(--line)!important}
+.tab.active{background:var(--green)!important;color:var(--pro-surface)!important}
+.danger{background:color-mix(in srgb,var(--pro-danger) 14%,transparent)!important;color:var(--pro-danger)!important}
+.error{color:var(--pro-danger)!important}
+.npd-nav{background:var(--pro-surface)!important;color:var(--green)!important;border-color:var(--line)!important}
+.npd-add{background:transparent!important;color:var(--green)!important;border-color:var(--line)!important}
+.npd-ring{background:conic-gradient(var(--green) var(--pct),color-mix(in srgb,var(--green) 13%,var(--pro-surface)) var(--pct))!important}
+.npd-ring.over{background:conic-gradient(var(--pro-carb) var(--pct),color-mix(in srgb,var(--pro-carb) 15%,var(--pro-surface)) var(--pct))!important}
+.npd-ring::before,.np-ring::before{background:var(--pro-surface)!important;box-shadow:inset 0 0 0 1px var(--line)!important}
+.npd-ring-in,.npd-ring-in strong,.npd-date b,.npd-meal-head h3,.npd-food b,.npd-preview b,.npd-cdate,.npd-hit b{color:var(--np-ink)!important}
+.npd-ring-in em,.npd-meal-head span,.npd-ckcal,.npd-cmeal-h span{color:var(--green)!important}
+.npd-track,.np-track{background:color-mix(in srgb,var(--green) 12%,var(--pro-surface))!important}
+.npd-macro i[style*="e9b43c"],.npd-track span[style*="e9b43c"]{background:var(--pro-carb)!important}
+.npd-macro i[style*="2e6648"],.npd-track span[style*="2e6648"]{background:var(--pro-prot)!important}
+.npd-macro i[style*="f4a261"],.npd-track span[style*="f4a261"]{background:var(--pro-fat)!important}
+.npd-cday summary{background:var(--pro-surface-2)!important}
+.npd-food,.npd-meal-head,.npd-cmeal{border-color:var(--line)!important}
+.npd-crow{color:var(--np-ink)!important}
+.npd-sheet-card{background:var(--pro-surface)!important;color:var(--np-ink)}
+#npdQuery{background:var(--pro-surface-2)!important}
+.np-theme-btn{background:var(--pale)!important;color:var(--green)!important;border:1px solid var(--line)!important;padding:8px 12px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+:root[data-theme=dark] header svg.np-brand-symbol{filter:saturate(.9) brightness(1.05)}
+:root[data-theme=dark] img{opacity:.92}
+.npi-badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--pale);color:var(--green);margin-left:6px}
+.npd-goal{color:var(--np-subtle)!important}.npd-goal b{color:var(--np-ink)!important}
