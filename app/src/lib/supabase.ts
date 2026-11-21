@@ -17,7 +17,9 @@ declare global {
 }
 
 /** Origen público de la web (en la APK, location.origin es file://). */
-export const ORIGIN = window.NP_ORIGIN || (location.protocol.startsWith('http') ? location.origin : 'https://nutriplan-asesoria.vercel.app');
+export const ORIGIN = (
+  window.NP_ORIGIN || (location.protocol.startsWith('http') ? new URL('.', location.href).href : 'https://nutriplan-asesoria.vercel.app')
+).replace(/\/+$/, '');
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'np2-auth' },

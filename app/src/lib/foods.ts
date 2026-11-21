@@ -72,19 +72,32 @@ export function fromOFF(p: OFFProduct | null | undefined): Food | null {
   };
 }
 
-const api = (path: string) => (location.protocol.startsWith('http') ? '' : ORIGIN) + path;
+const OFF_FIELDS = 'code,product_name_es,product_name,brands,stores,nutriments,serving_size,quantity,nutrition_data_per';
 
-export async function searchCatalog(q: string, signal?: AbortSignal): Promise<Food[]> {
-  const r = await fetch(api('/api/foods?' + new URLSearchParams({ q })), { headers: { Accept: 'application/json' }, signal });
+/** Primero el proxy propio (/api/foods, en Vercel). Si no existe (p. ej. GitHub Pages), Open Food Facts directo. */
+async function offQuery(params: Record<string, string>, signal?: AbortSignal): Promise<{ products?: OFFProduct[]; product?: OFFProduct | null }> {
+  try {
+    const r = await fetch(ORIGIN + '/api/foods?' + new URLSearchParams(params), { headers: { Accept: 'application/json' }, signal });
+    if (r.ok && (r.headers.get('content-type') || '').includes('json')) return await r.json();
+  } catch (e) {
+    if (signal?.aborted) throw e;
+  }
+  const url = params.barcode
+    ? 'https://world.openfoodfacts.org/api/v2/product/' + encodeURIComponent(params.barcode) + '?fields=' + OFF_FIELDS
+    : 'https://world.openfoodfacts.org/cgi/search.pl?' + new URLSearchParams({ search_terms: params.q, search_simple: '1', action: 'process', json: '1', page_size: '20', fields: OFF_FIELDS });
+  const r = await fetch(url, { headers: { Accept: 'application/json' }, signal });
   if (!r.ok) throw new Error('Catálogo no disponible');
   const v = await r.json();
-  return ((v.products || []) as OFFProduct[]).map(fromOFF).filter((x): x is Food => !!x);
+  return params.barcode ? { product: v.status === 1 ? v.product : null } : { products: v.products || [] };
+}
+
+export async function searchCatalog(q: string, signal?: AbortSignal): Promise<Food[]> {
+  const v = await offQuery({ q }, signal);
+  return (v.products || []).map(fromOFF).filter((x): x is Food => !!x);
 }
 
 export async function lookupBarcode(code: string): Promise<Food | null> {
-  const r = await fetch(api('/api/foods?' + new URLSearchParams({ barcode: code })), { headers: { Accept: 'application/json' } });
-  if (!r.ok) throw new Error('No se pudo consultar el código');
-  const v = await r.json();
+  const v = await offQuery({ barcode: code });
   return fromOFF(v.product);
 }
 

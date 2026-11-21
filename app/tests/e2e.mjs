@@ -1,6 +1,7 @@
 // Prueba de extremo a extremo con Supabase simulado.
 // Uso: npm run build && node tests/e2e.mjs [carpeta_capturas]
-import { chromium } from 'playwright';
+import { createRequire } from 'node:module';
+const { chromium } = createRequire(import.meta.url)('playwright'); // Playwright del sistema
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { CLIENT_UID, OWNER, install, seed } from './mock.mjs';

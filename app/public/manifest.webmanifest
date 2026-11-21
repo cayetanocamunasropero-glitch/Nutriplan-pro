@@ -1,11 +1,11 @@
 {
- "id": "/",
+ "id": "./",
  "name": "NutriPlan · Diario de nutrición",
  "short_name": "NutriPlan",
  "description": "Anota lo que comes, mira tus kcal y macros del día y comparte tu registro con tu coach.",
  "lang": "es",
- "start_url": "/?app=1",
- "scope": "/",
+ "start_url": "./?app=1",
+ "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
  "background_color": "#f3f2ec",
@@ -17,19 +17,19 @@
  ],
  "icons": [
   {
-   "src": "/icons/icon-192.png",
+   "src": "./icons/icon-192.png",
    "sizes": "192x192",
    "type": "image/png",
    "purpose": "any"
   },
   {
-   "src": "/icons/icon.svg",
+   "src": "./icons/icon.svg",
    "sizes": "any",
    "type": "image/svg+xml",
    "purpose": "any"
   },
   {
-   "src": "/icons/icon.svg",
+   "src": "./icons/icon.svg",
    "sizes": "any",
    "type": "image/svg+xml",
    "purpose": "maskable"
