@@ -1,0 +1,155 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  --bg: #f3f2ec;
+  --surface: #ffffff;
+  --surface-2: #ecebe3;
+  --surface-3: #e2e1d7;
+  --ink: #0f241d;
+  --muted: #627169;
+  --faint: #8d9891;
+  --line: rgba(15, 36, 29, 0.09);
+  --brand: #1e5b49;
+  --brand-2: #164536;
+  --brand-soft: #dceee5;
+  --on-brand: #ffffff;
+  --lime: #c9f26b;
+  --c-carb: #d48f1f;
+  --c-prot: #4a74e8;
+  --c-fat: #e8603e;
+  --c-water: #2d9fd8;
+  --danger: #c2412d;
+  --ok: #2f8f5b;
+  --shadow: 0 1px 2px rgba(15, 36, 29, 0.05), 0 8px 24px -12px rgba(15, 36, 29, 0.16);
+  --shadow-lg: 0 24px 60px -20px rgba(15, 36, 29, 0.35);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #0b1210;
+  --surface: #131c18;
+  --surface-2: #1a2520;
+  --surface-3: #233029;
+  --ink: #e9f1ec;
+  --muted: #95a59d;
+  --faint: #6c7b74;
+  --line: rgba(233, 241, 236, 0.08);
+  --brand: #5cc492;
+  --brand-2: #7dd6aa;
+  --brand-soft: #1b3329;
+  --on-brand: #06140e;
+  --lime: #c9f26b;
+  --c-carb: #bb7f17;
+  --c-prot: #6f8cf5;
+  --c-fat: #e06a4c;
+  --c-water: #55b8ea;
+  --danger: #ff7a63;
+  --ok: #5cc492;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 30px -14px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-lime: var(--lime);
+  --color-carb: var(--c-carb);
+  --color-prot: var(--c-prot);
+  --color-fat: var(--c-fat);
+  --color-water: var(--c-water);
+  --color-danger: var(--danger);
+  --color-ok: var(--ok);
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --shadow-card: var(--shadow);
+  --shadow-pop: var(--shadow-lg);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+#root {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 2.5px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+@layer components {
+.field {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.field:focus-visible {
+  outline: none;
+}
+.field:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+}
+.field::placeholder {
+  color: var(--faint);
+}
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.safe-b {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
