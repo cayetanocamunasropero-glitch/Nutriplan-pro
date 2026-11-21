@@ -1,4 +1,4 @@
-# Publica NutriPlan 2 en GitHub Pages (https://<usuario>.github.io/nutriplan-pro/).
+# Publica NutriPlan 2 en GitHub Pages (https://<usuario>.github.io/Nutriplan-pro/).
 # Requisito (una sola vez): Settings → Pages → Source: «GitHub Actions».
 name: GitHub Pages
 
