@@ -35,5 +35,12 @@ La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la
 - La app usa rutas relativas (`base: './'`), funciona en raíz o en subcarpeta.
 Vercel team `team_CNO0OyROIW0IYun3Vrwgzak8`, proyecto `prj_8XKbo9Zs5S2h3IhsNrzC3ZZ4VsdF` (nutriplan-asesoria). Publicar en producción **solo con el OK explícito de Cayetano** (la usan clientes reales). Probar antes en una vista previa.
 
+## Skills del proyecto (`.claude/skills/`, ver su README)
+Para la app (es una app, no una landing):
+- Diseño: `impeccable` (auditar/criticar, evita el «AI slop»), `web-design-guidelines`, `ui-ux-pro-max`. Respetar el sistema de diseño actual (tokens en `app/src/index.css`, Bricolage Grotesque + Instrument Sans, verde #1E5B49 + lima, macros validados para daltonismo).
+- Animación: skills de Emil Kowalski (`review-animations`, `improve-animations`, `emil-design-eng`); respetar `prefers-reduced-motion`.
+- Rendimiento React: `vercel-react-best-practices`.
+- Para webs comerciales/landing (no la app): `design-taste-frontend`, `scroll-world`, `refero-design`.
+
 ## Preferencias de Cayetano
 Trabajo iterativo y dirigido; conservar lo que ya funciona; no confundir apps por nombres parecidos; que los clientes no tengan que reinstalar.
