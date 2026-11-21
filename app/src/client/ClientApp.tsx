@@ -86,8 +86,8 @@ export function ClientApp({ session }: { session: Session }) {
 
   return (
     <div className="mx-auto min-h-dvh max-w-xl pb-28">
-      <AnimatePresence mode="wait">
-        <motion.main key={tab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+      <AnimatePresence initial={false}>
+        <motion.main key={tab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}>
           {tab === 'today' && <Today plan={plan} uid={uid} name={name} day={day} setDay={setDay} onError={onError} goPlan={() => setTab('plan')} />}
           {tab === 'plan' && <PlanView plan={plan} uid={uid} day={day} onError={onError} goToday={() => setTab('today')} />}
           {tab === 'progress' && <Progress plan={plan} uid={uid} onError={onError} />}

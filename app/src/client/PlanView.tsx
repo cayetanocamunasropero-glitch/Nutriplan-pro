@@ -66,8 +66,8 @@ export function PlanView({ plan, uid, day, onError, goToday }: { plan: Published
   return (
     <div className="px-4 pt-6">
       <header className="px-1">
-        <p className="text-sm font-semibold text-muted">{plan.content?.title || 'Plan de ' + (plan.client_name || '')}</p>
         <h1 className="font-display text-[30px] font-extrabold leading-tight tracking-tight">Mi plan</h1>
+        <p className="mt-0.5 text-sm text-muted">{plan.content?.title || 'Plan de ' + (plan.client_name || '')}</p>
         {goal.kcal > 0 && (
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold">
             <span className="rounded-full bg-ink px-3 py-1.5 text-bg tnum">{n0(goal.kcal)} kcal/día</span>
@@ -100,7 +100,7 @@ function GroupCard({ g, logged, onLog, onAdjust, onUndo }: { g: PlanGroup; logge
   return (
     <Card className="!p-0 overflow-hidden">
       <div className="flex items-center justify-between px-5 pt-4">
-        <h3 className="font-display text-xl font-bold">{g.name}</h3>
+        <h2 className="font-display text-xl font-bold">{g.name}</h2>
         {logged && (
           <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand">
             <Check className="size-3.5" /> Opción {logged.letter}

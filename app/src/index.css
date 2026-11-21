@@ -8,8 +8,8 @@
   --surface-2: #ecebe3;
   --surface-3: #e2e1d7;
   --ink: #0f241d;
-  --muted: #627169;
-  --faint: #8d9891;
+  --muted: #4f5c55;
+  --faint: #5f6b64;
   --line: rgba(15, 36, 29, 0.09);
   --brand: #1e5b49;
   --brand-2: #164536;
@@ -20,7 +20,11 @@
   --c-prot: #4a74e8;
   --c-fat: #e8603e;
   --c-water: #2d9fd8;
-  --danger: #c2412d;
+  /* Variantes para TEXTO sobre fondos claros o tintes (≥4,5:1) */
+  --c-carb-ink: #8f5c00;
+  --c-fat-ink: #b23f22;
+  --c-water-strong: #16729f;
+  --danger: #b3381f;
   --ok: #2f8f5b;
   --shadow: 0 1px 2px rgba(15, 36, 29, 0.05), 0 8px 24px -12px rgba(15, 36, 29, 0.16);
   --shadow-lg: 0 24px 60px -20px rgba(15, 36, 29, 0.35);
@@ -34,7 +38,7 @@
   --surface-3: #233029;
   --ink: #e9f1ec;
   --muted: #95a59d;
-  --faint: #6c7b74;
+  --faint: #86958e;
   --line: rgba(233, 241, 236, 0.08);
   --brand: #5cc492;
   --brand-2: #7dd6aa;
@@ -45,6 +49,9 @@
   --c-prot: #6f8cf5;
   --c-fat: #e06a4c;
   --c-water: #55b8ea;
+  --c-carb-ink: #e0a64a;
+  --c-fat-ink: #ff8a6b;
+  --c-water-strong: #1d7fb0;
   --danger: #ff7a63;
   --ok: #5cc492;
   --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 30px -14px rgba(0, 0, 0, 0.6);
@@ -70,12 +77,21 @@
   --color-prot: var(--c-prot);
   --color-fat: var(--c-fat);
   --color-water: var(--c-water);
+  --color-carb-ink: var(--c-carb-ink);
+  --color-fat-ink: var(--c-fat-ink);
+  --color-water-strong: var(--c-water-strong);
   --color-danger: var(--danger);
   --color-ok: var(--ok);
   --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --shadow-card: var(--shadow);
   --shadow-pop: var(--shadow-lg);
+  /* Movimiento: curvas fuertes (Emil Kowalski) y transiciones cortas por defecto */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html,
@@ -97,6 +113,18 @@ body {
 }
 button {
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+::selection {
+  background: color-mix(in oklab, var(--lime) 70%, transparent);
+  color: #0f241d;
+}
+html {
+  caret-color: var(--brand);
+  scrollbar-color: var(--surface-3) transparent;
+  accent-color: var(--brand);
 }
 button:disabled {
   cursor: default;
@@ -112,6 +140,16 @@ select {
   outline-offset: 2px;
   border-radius: 10px;
 }
+p,
+li,
+dd {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
 .tnum {
   font-variant-numeric: tabular-nums;
 }
@@ -123,7 +161,7 @@ select {
   border-radius: 14px;
   padding: 12px 14px;
   outline: none;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out);
 }
 .field:focus-visible {
   outline: none;
@@ -145,11 +183,23 @@ select {
 .safe-b {
   padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
+/* En móvil, los campos de menos de 16px hacen que iOS amplíe la página al tocarlos */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+}
+/* Movimiento reducido: sin desplazamientos ni escalas; se mantienen los cambios de color/opacidad.
+   Las animaciones de motion/react se reducen con <MotionConfig reducedMotion="user">. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  [class*='active:scale-'] {
+    transform: none !important;
   }
 }

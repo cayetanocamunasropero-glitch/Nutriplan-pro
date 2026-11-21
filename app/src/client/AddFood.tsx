@@ -300,13 +300,13 @@ export function PortionStep({ food, initial, add, cta = 'Añadir' }: { food: Foo
             {food.source || 'Biblioteca'} · {n0(food.kcal)} kcal/100 {unit}
           </p>
         </div>
-        <button onClick={() => setFav(toggleFav(food))} className={`grid size-10 shrink-0 place-items-center rounded-full ${fav ? 'bg-fat/15 text-fat' : 'bg-surface-2 text-faint'}`} aria-label="Favorito" aria-pressed={fav}>
+        <button onClick={() => setFav(toggleFav(food))} className={`grid size-10 shrink-0 place-items-center rounded-full ${fav ? 'bg-fat/15 text-fat-ink' : 'bg-surface-2 text-faint'}`} aria-label="Favorito" aria-pressed={fav}>
           <Heart className={`size-5 ${fav ? 'fill-current' : ''}`} />
         </button>
       </div>
 
       <div className="mt-6 flex items-center justify-center gap-4">
-        <button onClick={() => setG(String(Math.max(0, grams - step)))} className="grid size-14 place-items-center rounded-full bg-surface-2 active:scale-90" aria-label="Menos">
+        <button onClick={() => setG(String(Math.max(0, grams - step)))} className="grid size-14 place-items-center rounded-full bg-surface-2 transition-transform active:scale-95" aria-label="Menos">
           <Minus className="size-6" />
         </button>
         <div className="flex items-baseline gap-1">
@@ -320,7 +320,7 @@ export function PortionStep({ food, initial, add, cta = 'Añadir' }: { food: Foo
           />
           <span className="text-xl font-bold text-muted">{unit}</span>
         </div>
-        <button onClick={() => setG(String(grams + step))} className="grid size-14 place-items-center rounded-full bg-surface-2 active:scale-90" aria-label="Más">
+        <button onClick={() => setG(String(grams + step))} className="grid size-14 place-items-center rounded-full bg-surface-2 transition-transform active:scale-95" aria-label="Más">
           <Plus className="size-6" />
         </button>
       </div>

@@ -121,12 +121,13 @@ export function CoachApp({ session }: { session: Session }) {
     <div className="lg:flex lg:h-dvh">
       {/* Lista */}
       <aside className={`${sel ? 'hidden lg:flex' : 'flex'} min-h-dvh flex-col border-line lg:h-dvh lg:min-h-0 lg:w-[400px] lg:shrink-0 lg:border-r`}>
+        <h1 className="sr-only">Panel del coach</h1>
         <div className="px-4 pb-3 pt-5">
           <div className="flex items-center gap-3">
             <Logo size={38} />
             <div className="min-w-0 flex-1">
-              <div className="font-display text-lg font-bold leading-none">NutriPlan Coach</div>
-              <div className="mt-1 truncate text-xs text-muted">{session.user.email}</div>
+              <p className="whitespace-nowrap font-display text-lg font-bold leading-none">NutriPlan Coach</p>
+              <p className="mt-1 truncate text-xs text-muted">{session.user.email}</p>
             </div>
             <IconButton onClick={load} aria-label="Actualizar">
               <RefreshCw className={`size-4.5 ${refreshing ? 'animate-spin' : ''}`} />
@@ -171,9 +172,9 @@ export function CoachApp({ session }: { session: Session }) {
 
       {/* Detalle */}
       <section className={`${sel ? 'block' : 'hidden lg:block'} min-h-dvh flex-1 overflow-y-auto lg:h-dvh lg:min-h-0`}>
-        <AnimatePresence mode="wait">
+        <AnimatePresence initial={false}>
           {current ? (
-            <motion.div key={current.c.id} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <motion.div key={current.c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}>
               <ClientDetail row={current} back={() => setSel(null)} saveClient={saveClient} reload={load} toast={toast} />
             </motion.div>
           ) : (
@@ -207,9 +208,9 @@ export function CoachApp({ session }: { session: Session }) {
 function Kpi({ value, label, sub, onClick, on, warn }: { value: string; label: string; sub: string; onClick: () => void; on: boolean; warn?: boolean }) {
   return (
     <button onClick={onClick} className={`rounded-[20px] p-3 text-left transition ${on ? 'bg-ink text-bg' : 'bg-surface shadow-card'}`}>
-      <div className={`font-display text-2xl font-extrabold leading-none tnum ${warn && !on ? 'text-fat' : ''}`}>{value}</div>
+      <div className={`font-display text-2xl font-extrabold leading-none tnum ${warn && !on ? 'text-fat-ink' : ''}`}>{value}</div>
       <div className={`mt-1 text-[11px] font-bold ${on ? 'text-bg/80' : 'text-ink'}`}>{label}</div>
-      <div className={`text-[10px] ${on ? 'text-bg/60' : 'text-muted'}`}>{sub}</div>
+      <div className={`text-[11px] ${on ? 'text-bg/80' : 'text-muted'}`}>{sub}</div>
     </button>
   );
 }
@@ -226,7 +227,7 @@ function ClientRow({ r, on, onClick }: { r: Row; on: boolean; onClick: () => voi
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="truncate font-semibold">{r.c.name || 'Sin nombre'}</span>
-          {r.alert && <AlertTriangle className="size-3.5 shrink-0 text-fat" aria-label="Sin registrar" />}
+          {r.alert && <AlertTriangle className="size-3.5 shrink-0 text-fat-ink" aria-label="Sin registrar" />}
         </div>
         <div className="mt-1 flex items-center gap-2">
           <span className="flex gap-[3px]" aria-label={`${r.week} de 7 días registrados`}>

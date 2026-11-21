@@ -104,7 +104,7 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
                     const m = itemsMacros(o.items as LogItem[]);
                     const off = goal > 0 && Math.abs(m.kcal - goal) > Math.max(100, goal * 0.2);
                     return (
-                      <span key={o.letter} className={`rounded-xl px-2.5 py-1.5 text-xs font-semibold tnum ${off ? 'bg-carb/15 text-carb' : 'bg-surface-2'}`} title={(o.items || []).map((i) => i.name).join(', ')}>
+                      <span key={o.letter} className={`rounded-xl px-2.5 py-1.5 text-xs font-semibold tnum ${off ? 'bg-carb/15 text-carb-ink' : 'bg-surface-2'}`} title={(o.items || []).map((i) => i.name).join(', ')}>
                         {o.letter} · {n0(m.kcal)} kcal
                       </span>
                     );
@@ -176,7 +176,7 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
           Cancelar
         </Button>
       </div>
-      <div className={`mt-3 flex items-start gap-2 rounded-2xl p-3 text-sm ${bad ? 'bg-carb/12 text-carb' : 'bg-brand-soft text-brand'}`}>
+      <div className={`mt-3 flex items-start gap-2 rounded-2xl p-3 text-sm ${bad ? 'bg-carb/12 text-carb-ink' : 'bg-brand-soft text-brand'}`}>
         {bad ? <AlertTriangle className="mt-0.5 size-4 shrink-0" /> : <CheckCircle2 className="mt-0.5 size-4 shrink-0" />}
         <span>
           {draft.report ? draft.report + '. ' : ''}
@@ -207,7 +207,7 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
                     </b>
                     <span className="shrink-0 text-sm font-bold tnum">
                       {n0(m.kcal)} kcal
-                      {typeof o.pdfKcal === 'number' && Math.abs(Number(o.pdfKcal) - m.kcal) > 8 && <span className="ml-1 text-xs text-carb">(PDF {n0(o.pdfKcal)})</span>}
+                      {typeof o.pdfKcal === 'number' && Math.abs(Number(o.pdfKcal) - m.kcal) > 8 && <span className="ml-1 text-xs text-carb-ink">(PDF {n0(o.pdfKcal)})</span>}
                     </span>
                   </div>
                   <div className="-mx-1 overflow-x-auto">

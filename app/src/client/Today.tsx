@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronLeft, ChevronRight, CloudCheck, Copy, Droplets, Flame, Loader2, MessageSquareText, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CloudCheck, Copy, Droplets, Flame, Loader2, MessageSquareText, Minus, Plus, Trash2 } from 'lucide-react';
 import { getLogs } from '../lib/data';
 import { lastDays, pretty, shift, today, weekdayLetter } from '../lib/dates';
 import { entriesMacros, itemMacros, itemsMacros, n0, n1, planTarget, SLOTS, slotForNow, slotOf, isFood, unitOf } from '../lib/nutrition';
@@ -12,6 +12,8 @@ import { useToast } from '../ui/Toast';
 import { AddFood, PortionStep } from './AddFood';
 import { useDay } from './useDay';
 import { planGroups } from './PlanView';
+import { ActivityCard, findActivity } from './Activity';
+import { Tips } from './Tips';
 
 export function planFoodsOf(plan: PublishedPlan): Food[] {
   const out: Food[] = [];
@@ -99,12 +101,15 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
       {/* Cabecera */}
       <header className="flex items-start justify-between px-1">
         <div>
-          <p className="text-sm font-semibold text-muted">{hello}{name ? ',' : ''}</p>
-          <h1 className="font-display text-[30px] font-extrabold leading-tight tracking-tight">{name || 'NutriPlan'}</h1>
+          <h1 className="font-display text-[28px] font-extrabold leading-tight tracking-tight">
+            {hello}
+            {name ? <>, {name}</> : ''}
+          </h1>
+          <p className="mt-0.5 text-sm text-muted">{pretty(day) === 'Hoy' ? new Date(day + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) : pretty(day)}</p>
         </div>
         <div className="mt-1 flex items-center gap-2">
           {streak > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-fat/12 px-3 py-1.5 text-sm font-bold text-fat" title="Días seguidos registrando">
+            <span className="inline-flex items-center gap-1 rounded-full bg-fat/12 px-3 py-1.5 text-sm font-bold text-fat-ink" title="Días seguidos registrando">
               <Flame className="size-4" />
               {streak}
             </span>
@@ -132,7 +137,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                 onClick={() => setDay(s)}
                 className={`flex flex-col items-center rounded-2xl py-2 transition disabled:opacity-30 ${on ? 'bg-ink text-bg' : 'hover:bg-surface-2'}`}
               >
-                <span className={`text-[10px] font-bold ${on ? 'text-bg/70' : 'text-faint'}`}>{weekdayLetter(s)}</span>
+                <span className={`text-[11px] font-bold ${on ? 'text-bg/80' : 'text-faint'}`}>{weekdayLetter(s)}</span>
                 <span className="font-display text-base font-bold tnum">{+s.slice(8)}</span>
                 <span className={`mt-0.5 size-1.5 rounded-full ${has ? (on ? 'bg-lime' : 'bg-brand') : 'bg-transparent'}`} />
               </button>
@@ -176,6 +181,8 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
         </div>
       </Card>
 
+      <Tips hasPlan={planFoods.length > 0} />
+
       {d.loading && !d.entries.length ? (
         <div className="flex justify-center py-10">
           <Loader2 className="size-6 animate-spin text-brand" />
@@ -199,7 +206,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                 <Card key={slot} className="!p-0">
                   <div className="flex items-center justify-between px-5 pb-1 pt-4">
                     <div>
-                      <h3 className="font-display text-[17px] font-bold">{slot}</h3>
+                      <h2 className="font-display text-[17px] font-bold">{slot}</h2>
                       {list.length > 0 && <p className="text-xs font-semibold text-muted tnum">{n0(st)} kcal</p>}
                     </div>
                     <button onClick={() => setAdding(slot)} className="grid size-10 place-items-center rounded-full bg-brand text-on-brand shadow-card active:scale-90" aria-label={'Añadir a ' + slot}>
@@ -231,7 +238,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                     </ul>
                   ) : (
                     <div className="flex items-center gap-2 px-5 pb-4 pt-1">
-                      <p className="flex-1 text-sm text-faint">Nada anotado todavía</p>
+                      <p className="flex-1 text-sm text-faint">Sin anotar</p>
                       {hasYesterday && (
                         <button onClick={() => copyFromYesterday(slot)} className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-bold text-muted hover:text-ink">
                           <Copy className="size-3.5" /> Repetir ayer
@@ -250,6 +257,13 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
           </div>
 
           <Water ml={d.water} set={(ml) => d.update((s) => ({ ...s, water: ml }))} />
+          <ActivityCard
+            entry={findActivity(d.entries)}
+            save={(a) => {
+              d.update((s) => ({ ...s, entries: [...s.entries.filter((e) => e?.kind !== 'activity'), ...(a ? [a] : [])] }));
+              toast(a ? 'Actividad guardada' : 'Actividad borrada');
+            }}
+          />
           <Notes value={d.notes} save={(t) => d.update((s) => ({ ...s, notes: t })).then(() => toast('Nota guardada'))} />
         </>
       )}
@@ -257,7 +271,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
       {/* Botón flotante */}
       <button
         onClick={() => setAdding(slotForNow())}
-        className="fixed bottom-24 right-[max(16px,calc(50%-276px))] z-30 grid size-15 place-items-center rounded-[22px] bg-lime text-[#0f241d] shadow-pop transition active:scale-90"
+        className="fixed bottom-24 right-[max(16px,calc(50%-276px))] z-30 grid size-15 place-items-center rounded-[22px] bg-lime text-[#0f241d] shadow-pop transition-transform active:scale-95"
         aria-label="Añadir alimento"
       >
         <Plus className="size-7" strokeWidth={2.8} />
@@ -323,7 +337,7 @@ function Water({ ml, set }: { ml: number; set: (ml: number) => void }) {
             <Droplets className="size-5" />
           </span>
           <div>
-            <h3 className="font-display text-[17px] font-bold">Agua</h3>
+            <h2 className="font-display text-[17px] font-bold">Agua</h2>
             <p className="text-xs font-semibold text-muted tnum">
               {(ml / 1000).toLocaleString('es-ES', { maximumFractionDigits: 2 })} L de {(glasses * 0.25).toLocaleString('es-ES')} L
             </p>
@@ -331,9 +345,9 @@ function Water({ ml, set }: { ml: number; set: (ml: number) => void }) {
         </div>
         <div className="flex gap-1.5">
           <button onClick={() => set(Math.max(0, ml - 250))} disabled={ml <= 0} className="h-9 rounded-xl bg-surface-2 px-3 text-sm font-bold disabled:opacity-40" aria-label="Quitar 250 ml">
-            −
+            <Minus className="mx-auto size-4" />
           </button>
-          <button onClick={() => set(ml + 250)} className="h-9 rounded-xl bg-water px-3 text-sm font-bold text-white" aria-label="Añadir 250 ml">
+          <button onClick={() => set(ml + 250)} className="h-9 rounded-xl bg-water-strong px-3 text-sm font-bold text-white" aria-label="Añadir 250 ml">
             + 250 ml
           </button>
         </div>
@@ -341,7 +355,7 @@ function Water({ ml, set }: { ml: number; set: (ml: number) => void }) {
       <div className="mt-4 flex gap-1.5">
         {Array.from({ length: Math.max(glasses, full) }, (_, i) => (
           <button key={i} onClick={() => set((i + 1) * 250 === ml ? i * 250 : (i + 1) * 250)} className="h-9 flex-1 overflow-hidden rounded-lg bg-surface-2" aria-label={`${(i + 1) * 250} ml`}>
-            <motion.span className="block w-full rounded-lg bg-water" initial={false} animate={{ height: i < full ? '100%' : '0%' }} style={{ marginTop: 'auto' }} />
+            <motion.span className="block h-full w-full origin-bottom rounded-lg bg-water" initial={false} animate={{ scaleY: i < full ? 1 : 0 }} transition={{ type: 'spring', duration: 0.35, bounce: 0 }} />
           </button>
         ))}
       </div>
@@ -359,7 +373,7 @@ function Notes({ value, save }: { value: string; save: (t: string) => void }) {
           <MessageSquareText className="size-5" />
         </span>
         <div>
-          <h3 className="font-display text-[17px] font-bold">Nota para tu coach</h3>
+          <h2 className="font-display text-[17px] font-bold">Nota para tu coach</h2>
           <p className="text-xs text-muted">Hambre, sensaciones, entreno, dudas…</p>
         </div>
       </div>

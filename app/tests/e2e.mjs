@@ -104,6 +104,19 @@ async function login(p, email) {
   log = L();
   ok(log.entries.length === 3, 'repetir cena de ayer');
 
+  // Actividad (formato compatible con la versión clásica)
+  await p.getByRole('button', { name: 'Cerrar la ayuda' }).click();
+  await p.getByRole('button', { name: 'Anotar' }).click();
+  await p.getByPlaceholder('Ej. 8500').fill('9200');
+  await p.getByRole('button', { name: 'Pádel · Partido' }).click();
+  await p.getByRole('button', { name: 'Añadir entrenamiento' }).click();
+  await p.getByRole('button', { name: 'Guardar actividad' }).click();
+  await p.waitForTimeout(700);
+  log = L();
+  const act = log.entries.find((e) => e.kind === 'activity');
+  ok(act && act.steps === 9200 && act.activities[0].type === 'Pádel · Partido' && act.meal === '__actividad_y_pasos', 'pasos y actividad guardados en formato clásico');
+  ok(log.entries.filter((e) => e.kind === 'activity').length === 1, 'una sola entrada de actividad por día');
+
   // Plan
   await p.getByRole('button', { name: 'Mi plan', exact: true }).click();
   await p.getByRole('heading', { name: 'Mi plan' }).waitFor();
@@ -133,6 +146,15 @@ async function login(p, email) {
   await p.getByRole('button', { name: 'Yo', exact: true }).click();
   await p.waitForTimeout(300);
   await p.screenshot({ path: `${OUT}/08-yo.png` });
+  ok(await p.getByText('2300 kcal').isVisible(), 'tarjeta de objetivo visible en «Yo»');
+  await p.getByRole('button', { name: 'Privacidad y mis datos' }).click();
+  await p.getByRole('heading', { name: 'Quién los ve' }).waitFor();
+  await p.screenshot({ path: `${OUT}/08b-privacidad.png` });
+  const dl = p.waitForEvent('download');
+  await p.getByRole('button', { name: 'Descargar mis datos' }).click();
+  const file = await dl;
+  ok(/nutriplan-mis-datos-.*\.json/.test(file.suggestedFilename()), 'descarga de datos personales');
+  await p.keyboard.press('Escape');
   ok(!writes.some((w) => w.table === 'nutriplan_private_store'), 'el cliente nunca escribe en la ficha privada del coach');
   await c.close();
 }
@@ -157,6 +179,24 @@ async function login(p, email) {
   ok(db.nutriplan_client_onboarding[0]?.completed_at, 'cuestionario guardado y completado');
   await p.waitForTimeout(700);
   await p.screenshot({ path: `${OUT}/11-hoy-oscuro.png` });
+  await c.close();
+}
+
+// ---------- 2b. Alta: el consentimiento es obligatorio ----------
+{
+  const db = seed({ linked: false });
+  const { c, p } = await ctx();
+  await install(p, db, { uid: CLIENT_UID });
+  await p.goto(BASE);
+  await p.getByRole('radio', { name: 'Crear cuenta' }).click();
+  await p.getByPlaceholder('tu@correo.com').fill('nuevo@example.com');
+  await p.getByPlaceholder('Mínimo 8 caracteres').fill('secreto123');
+  await p.getByRole('button', { name: 'Crear mi cuenta' }).click();
+  ok(await p.getByText('acepta la información de privacidad').isVisible(), 'sin consentimiento no se crea la cuenta');
+  await p.getByRole('checkbox').check();
+  await p.getByRole('button', { name: 'Crear mi cuenta' }).click();
+  await p.getByText('Activa tu acceso').waitFor();
+  ok(true, 'con consentimiento se crea la cuenta');
   await c.close();
 }
 

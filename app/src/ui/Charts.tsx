@@ -65,7 +65,13 @@ export function MacroBar({ label, value, goal, color }: { label: string; value: 
         <span className="text-[12px] font-semibold text-faint">{goal > 0 ? ' / ' + Math.round(goal) + ' g' : ' g'}</span>
       </div>
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
-        <motion.div className="h-full rounded-full" style={{ background: color }} initial={{ width: 0 }} animate={{ width: w + '%' }} transition={{ type: 'spring', damping: 24, stiffness: 120 }} />
+        <motion.div
+          className="h-full origin-left rounded-full"
+          style={{ background: color }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: w / 100 }}
+          transition={{ type: 'spring', duration: 0.6, bounce: 0 }}
+        />
       </div>
     </div>
   );
@@ -83,7 +89,7 @@ export function DayBars({ data, goal, height = 150, onPick }: { data: BarDatum[]
       <div className="relative" style={{ height }}>
         {goal > 0 && (
           <div className="absolute inset-x-0 border-t border-dashed border-faint/70" style={{ top: y(goal) }}>
-            <span className="absolute -top-[18px] right-0 rounded bg-surface px-1 text-[10px] font-semibold text-muted">Objetivo {Math.round(goal)}</span>
+            <span className="absolute -top-[18px] right-0 rounded bg-surface px-1 text-[11px] font-semibold text-muted">Objetivo {Math.round(goal)}</span>
           </div>
         )}
         <div className="absolute inset-0 flex items-end gap-[3px]">
@@ -104,11 +110,11 @@ export function DayBars({ data, goal, height = 150, onPick }: { data: BarDatum[]
               >
                 {d.value <= 0 && <span className="mb-0 h-1 w-full max-w-[22px] rounded-full bg-surface-2" />}
                 <motion.span
-                  className="w-full max-w-[22px] rounded-t-[4px]"
-                  style={{ background: ok ? 'var(--brand)' : d.value > goal * 1.1 && goal > 0 ? 'var(--c-fat)' : 'var(--c-carb)', opacity: hover === null || hover === i ? 1 : 0.45 }}
-                  initial={{ height: 0 }}
-                  animate={{ height: h }}
-                  transition={{ type: 'spring', damping: 22, stiffness: 140, delay: i * 0.015 }}
+                  className="w-full max-w-[22px] origin-bottom rounded-t-[4px]"
+                  style={{ height: h, background: ok ? 'var(--brand)' : d.value > goal * 1.1 && goal > 0 ? 'var(--c-fat)' : 'var(--c-carb)', opacity: hover === null || hover === i ? 1 : 0.45 }}
+                  initial={{ scaleY: 0 }}
+                  animate={{ scaleY: 1 }}
+                  transition={{ type: 'spring', duration: 0.5, bounce: 0, delay: Math.min(i * 0.02, 0.2) }}
                 />
               </button>
             );
@@ -126,7 +132,7 @@ export function DayBars({ data, goal, height = 150, onPick }: { data: BarDatum[]
       </div>
       <div className="mt-2 flex gap-[3px]">
         {data.map((d, i) => (
-          <span key={d.key} className={`flex-1 text-center text-[10px] font-semibold ${hover === i ? 'text-ink' : 'text-faint'}`}>
+          <span key={d.key} className={`flex-1 text-center text-[11px] font-semibold ${hover === i ? 'text-ink' : 'text-faint'}`}>
             {d.label}
           </span>
         ))}
@@ -205,7 +211,7 @@ export function WeightLine({ points, height = 170 }: { points: { day: string; kg
           </div>
         </>
       )}
-      <div className="mt-1 flex justify-between text-[10px] font-semibold text-faint">
+      <div className="mt-1 flex justify-between text-[11px] font-semibold text-faint">
         <span>{new Date(data[0].day + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>
         <span>{new Date(data[data.length - 1].day + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>
       </div>

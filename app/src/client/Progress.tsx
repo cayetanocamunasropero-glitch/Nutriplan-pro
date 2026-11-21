@@ -90,7 +90,7 @@ export function Progress({ plan, uid, onError }: { plan: PublishedPlan; uid: str
                 <p className="mt-1 text-xs text-muted">Último registro · {short(current.recorded_on)}</p>
               </div>
               {weights.length > 1 && (
-                <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-bold tnum ${delta <= 0 ? 'bg-brand-soft text-brand' : 'bg-carb/15 text-carb'}`}>
+                <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-bold tnum ${delta <= 0 ? 'bg-brand-soft text-brand' : 'bg-carb/15 text-carb-ink'}`}>
                   {delta <= 0 ? <TrendingDown className="size-4" /> : <TrendingUp className="size-4" />}
                   {delta > 0 ? '+' : ''}
                   {delta.toLocaleString('es-ES', { maximumFractionDigits: 1 })} kg

@@ -50,7 +50,7 @@ export function Onboarding({ uid, initial, editing, onDone }: { uid: string; ini
         <div className="flex flex-1 gap-1.5">
           {SURVEY.map((_, i) => (
             <span key={i} className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
-              <motion.span className="block h-full bg-brand" animate={{ width: i <= step ? '100%' : '0%' }} />
+              <motion.span className="block h-full origin-left bg-brand" initial={false} animate={{ scaleX: i <= step ? 1 : 0 }} transition={{ type: 'spring', duration: 0.4, bounce: 0 }} />
             </span>
           ))}
         </div>
@@ -61,9 +61,8 @@ export function Onboarding({ uid, initial, editing, onDone }: { uid: string; ini
 
       <AnimatePresence mode="wait">
         <motion.div key={step} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.2 }} className="flex-1">
-          {step === 0 && !editing && <p className="mt-8 text-sm font-semibold text-brand">¡Bienvenido/a! Antes de empezar…</p>}
-          <h1 className={`${step === 0 && !editing ? 'mt-1' : 'mt-8'} font-display text-[32px] font-extrabold leading-tight tracking-tight`}>{S.title}</h1>
-          <p className="mt-2 text-[15px] text-muted">{S.desc}</p>
+          <h1 className="mt-8 font-display text-[32px] font-extrabold leading-tight tracking-tight">{S.title}</h1>
+          <p className="mt-2 text-[15px] text-muted">{step === 0 && !editing ? 'Bienvenido/a. Antes de empezar, cuéntale a tu coach lo básico de tu rutina. Podrás editarlo cuando quieras.' : S.desc}</p>
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-4">
             {S.fields.map((fl) => (
               <label key={fl.key} className={fl.type === 'number' ? 'col-span-1' : 'col-span-2'}>
