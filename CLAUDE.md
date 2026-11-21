@@ -6,7 +6,7 @@ El repositorio es **público**: nunca subir PDFs de clientes, datos de salud, cl
 ## Estructura
 - `app/` → **NutriPlan 2** (la app nueva). React 19 + TypeScript + Vite + Tailwind v4 + motion. PWA.
   - `src/lib/` datos y lógica: `supabase.ts` (cliente, OWNER, ORIGIN), `data.ts` (todas las consultas), `nutrition.ts` (macros, Harris-Benedict, objetivos), `foods.ts` (biblioteca de 215 alimentos + Open Food Facts vía `/api/foods`), `pdf/` (lector de PDF por tabla, mismo que la versión clásica).
-  - `src/client/` app del cliente: Hoy (anillo kcal, comidas, agua, nota), Mi plan (opciones A/B/C → «Registrar»), Progreso (kcal 14 días, peso, fotos), Yo; código de WhatsApp y cuestionario inicial.
+  - `src/client/` app del cliente: Hoy (anillo kcal, comidas, agua, actividad/pasos, nota, ayuda inicial), Mi plan (opciones A/B/C → «Registrar»), Progreso (kcal 14 días, peso, fotos), Yo (privacidad + descarga de datos); código de WhatsApp, consentimiento RGPD al registrarse y cuestionario inicial.
   - `src/coach/` panel del coach: lista con alertas y constancia 7 días, detalle por cliente (Resumen, Diario, Plan + importar PDF, Ficha + cálculo de objetivo, Acceso por WhatsApp).
   - `src/ui/` componentes (kit, Sheet, Toast, Charts, back). `window.npBack()` = botón atrás de la APK.
   - `api/foods.js` (Open Food Facts), `api/clasica.js` + `clasica/` → **la versión clásica intacta en `/clasica`** (editor por gramos, generador, alternativas).
@@ -26,6 +26,7 @@ La app nueva usa **las mismas tablas y formatos** que la clásica; ambas pueden 
 - `npm run dev` · `npm run build`
 - `npm run test:e2e` → Playwright con Supabase simulado (`tests/mock.mjs`), 20+ comprobaciones de compatibilidad de datos. `PDF=/ruta.pdf` añade la prueba de importación.
 - `npm run test:pdf` → lector de PDF sobre `legacy/pdf_pruebas/` (carpeta local, ignorada por git).
+- `npm run test:audit` → detector de Impeccable sobre cada pantalla renderizada (contraste, tamaños, títulos…). Avisos aceptados a propósito: `cream-palette` y `overused-font` (identidad de marca).
 
 ## APK
 La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la escribe con `document.write` desde `file://`. La app nueva es compatible (probado): sin rutas por URL, `ORIGIN`/`NP_ORIGIN` para llamadas a `/api`, CORS en assets, `window.npBack`. Las mejoras llegan sin reinstalar.
@@ -34,6 +35,10 @@ La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la
 - **GitHub Pages** (vista previa): `.github/workflows/pages.yml` publica `app/dist` en cada push a `main` o a la rama de trabajo → `https://cayetanocamunasropero-glitch.github.io/Nutriplan-pro/`. Requiere Settings → Pages → Source «GitHub Actions». Sin servidor: el buscador llama directo a Open Food Facts y `/clasica` no existe allí.
 - La app usa rutas relativas (`base: './'`), funciona en raíz o en subcarpeta.
 Vercel team `team_CNO0OyROIW0IYun3Vrwgzak8`, proyecto `prj_8XKbo9Zs5S2h3IhsNrzC3ZZ4VsdF` (nutriplan-asesoria). Publicar en producción **solo con el OK explícito de Cayetano** (la usan clientes reales). Probar antes en una vista previa.
+
+## Diseño (tokens en `app/src/index.css`)
+- Texto secundario: `muted`/`faint` (≥4,5:1). Para texto de color usar `text-carb-ink`, `text-fat-ink`; `carb`/`fat`/`prot` solo para marcas (barras, puntos). Fondos de color en tarjetas: `<Card tone="brand|ink">`, nunca `bg-*` por className.
+- Movimiento: curvas `--ease-out`/`--ease-drawer`, animar `transform`/`opacity` (no width/height), `MotionConfig reducedMotion="user"`. La hoja inferior se cierra arrastrando.
 
 ## Skills del proyecto (`.claude/skills/`, ver su README)
 Para la app (es una app, no una landing):

@@ -66,7 +66,7 @@ export function ProfileTab({ row, save, reload, toast }: { row: Row; save: (c: C
           <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
             {ACT.map(([v, l]) => (
               <button key={v} onClick={() => set('activity', v)} className={`shrink-0 rounded-xl px-3 py-2 text-sm font-semibold ${String(c.activity) === v ? 'bg-ink text-bg' : 'bg-surface-2 text-muted'}`}>
-                {l} <span className="opacity-60">×{v}</span>
+                {l} <span className="opacity-80">×{v}</span>
               </button>
             ))}
           </div>
@@ -94,19 +94,19 @@ export function ProfileTab({ row, save, reload, toast }: { row: Row; save: (c: C
       </Card>
 
       <SectionTitle>Resultado</SectionTitle>
-      <Card className="bg-ink !text-bg">
+      <Card tone="ink">
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
             <div className="font-display text-xl font-bold tnum">{Number.isFinite(b) ? n0(b) : '—'}</div>
-            <div className="text-[11px] opacity-70">basal</div>
+            <div className="text-[11px] opacity-80">basal</div>
           </div>
           <div>
             <div className="font-display text-xl font-bold tnum">{Number.isFinite(maint) ? n0(maint) : '—'}</div>
-            <div className="text-[11px] opacity-70">mantenimiento</div>
+            <div className="text-[11px] opacity-80">mantenimiento</div>
           </div>
           <div>
             <div className="font-display text-3xl font-extrabold text-lime tnum">{t ? n0(t.kcal) : '—'}</div>
-            <div className="text-[11px] opacity-70">objetivo kcal</div>
+            <div className="text-[11px] opacity-80">objetivo kcal</div>
           </div>
         </div>
         {t && (
@@ -114,7 +114,7 @@ export function ProfileTab({ row, save, reload, toast }: { row: Row; save: (c: C
             HC {t.c} g · Proteínas {t.p} g{proteinPerKg ? ` (${proteinPerKg.toLocaleString('es-ES', { maximumFractionDigits: 1 })} g/kg)` : ''} · Grasas {t.f} g
           </p>
         )}
-        {current.kcal > 0 && <p className="mt-2 text-center text-xs opacity-60 tnum">Objetivo actual en la app del cliente: {n0(current.kcal)} kcal</p>}
+        {current.kcal > 0 && <p className="mt-2 text-center text-xs opacity-80 tnum">Objetivo actual en la app del cliente: {n0(current.kcal)} kcal</p>}
       </Card>
 
       <div className="mt-4 flex flex-wrap gap-2">

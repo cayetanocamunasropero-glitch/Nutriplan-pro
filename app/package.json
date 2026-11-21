@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "test:e2e": "vite build && node tests/e2e.mjs",
-    "test:pdf": "node tests/pdf.mjs ../legacy/pdf_pruebas"
+    "test:pdf": "node tests/pdf.mjs ../legacy/pdf_pruebas",
+    "test:audit": "vite build && node tests/audit.mjs tests/shots"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.2",

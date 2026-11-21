@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js';
-import type { ReactNode } from 'react';
-import { ClipboardList, LogOut } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { ClipboardList, LogOut, Monitor, Moon, ShieldCheck, Sun } from 'lucide-react';
+import { PrivacySheet } from './Privacy';
 import { useTheme, type Theme } from '../lib/theme';
 import { n0, planTarget } from '../lib/nutrition';
 import type { PublishedPlan } from '../lib/types';
@@ -9,6 +10,7 @@ import { signOut } from '../App';
 
 export function Me({ session, plan, form, editSurvey }: { session: Session; plan: PublishedPlan; form: Record<string, string>; editSurvey: () => void }) {
   const [theme, setTheme] = useTheme();
+  const [privacy, setPrivacy] = useState(false);
   const goal = planTarget(plan.content);
   const full = [form.firstName, form.lastName].filter(Boolean).join(' ') || plan.client_name || 'Tu perfil';
   return (
@@ -22,13 +24,13 @@ export function Me({ session, plan, form, editSurvey }: { session: Session; plan
       </div>
 
       {goal.kcal > 0 && (
-        <Card className="mt-5 bg-brand !text-on-brand">
-          <p className="text-sm font-semibold opacity-75">Tu objetivo diario</p>
+        <Card tone="brand" className="mt-5">
+          <p className="text-sm font-semibold opacity-85">Tu objetivo diario</p>
           <p className="mt-1 font-display text-4xl font-extrabold tracking-tight tnum">{n0(goal.kcal)} kcal</p>
           <p className="mt-2 text-sm opacity-80 tnum">
             HC {n0(goal.c)} g · Proteínas {n0(goal.p)} g · Grasas {n0(goal.f)} g
           </p>
-          <p className="mt-3 text-xs opacity-60">Lo ajusta tu coach según tu evolución.</p>
+          <p className="mt-3 text-xs opacity-80">Lo ajusta tu coach según tu evolución.</p>
         </Card>
       )}
 
@@ -36,16 +38,18 @@ export function Me({ session, plan, form, editSurvey }: { session: Session; plan
       <Segmented<Theme>
         value={theme}
         onChange={setTheme}
+        label="Apariencia"
         options={[
-          { value: 'light', label: '☀︎ Claro' },
-          { value: 'dark', label: '☾ Oscuro' },
-          { value: 'system', label: 'Auto' },
+          { value: 'light', label: <><Sun className="size-4" /> Claro</> },
+          { value: 'dark', label: <><Moon className="size-4" /> Oscuro</> },
+          { value: 'system', label: <><Monitor className="size-4" /> Auto</> },
         ]}
       />
 
       <SectionTitle>Cuenta</SectionTitle>
       <Card className="!p-2">
         <Row icon={<ClipboardList className="size-5" />} label="Editar mi cuestionario" onClick={editSurvey} />
+        <Row icon={<ShieldCheck className="size-5" />} label="Privacidad y mis datos" onClick={() => setPrivacy(true)} />
         <Row icon={<LogOut className="size-5" />} label="Cerrar sesión" onClick={signOut} danger />
       </Card>
 
@@ -54,6 +58,7 @@ export function Me({ session, plan, form, editSurvey }: { session: Session; plan
         <br />
         NutriPlan · Cayetano Camuñas Coach
       </p>
+      <PrivacySheet open={privacy} onClose={() => setPrivacy(false)} plan={plan} uid={session.user.id} />
     </div>
   );
 }

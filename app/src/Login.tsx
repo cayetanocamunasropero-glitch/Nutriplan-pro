@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Eye, EyeOff, Mail } from 'lucide-react';
 import { ORIGIN, errText, supabase } from './lib/supabase';
+import { PrivacySheet } from './client/Privacy';
 import { Button, Label, Segmented } from './ui/kit';
 import { Logo } from './ui/Logo';
 
@@ -19,12 +20,18 @@ export function Login() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ t: string; bad?: boolean } | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
     setMsg(null);
     if (!email.trim() || pass.length < (mode === 'up' ? 8 : 1)) {
       setMsg({ t: mode === 'up' ? 'Escribe tu correo y una contraseña de al menos 8 caracteres.' : 'Escribe tu correo y contraseña.', bad: true });
+      return;
+    }
+    if (mode === 'up' && !consent) {
+      setMsg({ t: 'Para crear la cuenta, acepta la información de privacidad.', bad: true });
       return;
     }
     setBusy(true);
@@ -120,6 +127,18 @@ export function Login() {
               </button>
             </div>
           </label>
+          {mode === 'up' && (
+            <label className="mt-4 flex cursor-pointer items-start gap-3 px-1 text-[13px] leading-snug text-muted">
+              <input type="checkbox" className="mt-0.5 size-5 shrink-0 accent-[var(--brand)]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+              <span>
+                He leído la{' '}
+                <button type="button" onClick={() => setPrivacy(true)} className="font-semibold text-brand underline underline-offset-2">
+                  información de privacidad
+                </button>{' '}
+                y doy mi consentimiento para que mi coach trate mis datos, incluidos los de salud que yo registre.
+              </span>
+            </label>
+          )}
           {msg && <p className={`mt-3 px-1 text-sm ${msg.bad ? 'text-danger' : 'text-ok'}`}>{msg.t}</p>}
           <Button type="submit" size="lg" loading={busy} className="mt-4 w-full" icon={!busy && <ArrowRight className="size-5" />}>
             {mode === 'in' ? 'Entrar' : 'Crear mi cuenta'}
@@ -130,6 +149,7 @@ export function Login() {
             </button>
           )}
         </motion.form>
+        <PrivacySheet open={privacy} onClose={() => setPrivacy(false)} />
       </div>
     </div>
   );

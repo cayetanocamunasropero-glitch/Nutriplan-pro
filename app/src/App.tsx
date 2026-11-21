@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
+import { MotionConfig } from 'motion/react';
 import { adoptLegacySession, OWNER, supabase } from './lib/supabase';
 import { ToastProvider } from './ui/Toast';
 import { Spinner } from './ui/kit';
@@ -24,6 +25,7 @@ export default function App() {
   }, []);
 
   return (
+    <MotionConfig reducedMotion="user">
     <ToastProvider>
       {session === undefined ? (
         <div className="grid min-h-dvh place-items-center">
@@ -39,6 +41,7 @@ export default function App() {
         <ClientApp session={session} />
       )}
     </ToastProvider>
+    </MotionConfig>
   );
 }
 

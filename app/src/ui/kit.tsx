@@ -33,19 +33,29 @@ export function IconButton({ className = '', children, ...rest }: ButtonHTMLAttr
   return (
     <button
       {...rest}
-      className={`grid size-10 place-items-center rounded-full text-ink transition hover:bg-surface-2 active:scale-90 disabled:opacity-30 ${className}`}
+      className={`grid size-10 place-items-center rounded-full text-ink transition hover:bg-surface-2 active:scale-95 disabled:opacity-30 ${className}`}
     >
       {children}
     </button>
   );
 }
 
-export function Card({ className = '', children, onClick }: { className?: string; children: ReactNode; onClick?: () => void }) {
-  return (
-    <div onClick={onClick} className={`rounded-[26px] bg-surface p-5 shadow-card ${onClick ? 'cursor-pointer transition active:scale-[.99]' : ''} ${className}`}>
-      {children}
-    </div>
-  );
+const TONES = {
+  surface: 'bg-surface text-ink',
+  brand: 'bg-brand text-on-brand',
+  ink: 'bg-ink text-bg',
+} as const;
+
+/** Tarjeta base. `tone` cambia fondo y texto juntos (nunca pasar bg-* por className: lo pisaría bg-surface). */
+export function Card({ className = '', children, onClick, tone = 'surface' }: { className?: string; children: ReactNode; onClick?: () => void; tone?: keyof typeof TONES }) {
+  const cls = `rounded-[26px] p-5 shadow-card ${TONES[tone]} ${className}`;
+  if (onClick)
+    return (
+      <button type="button" onClick={onClick} className={`block w-full text-left transition-transform active:scale-[.99] ${cls}`}>
+        {children}
+      </button>
+    );
+  return <div className={cls}>{children}</div>;
 }
 
 export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
@@ -69,8 +79,10 @@ export function Spinner({ label }: { label?: string }) {
 export function Empty({ icon, title, text, action }: { icon?: ReactNode; title: string; text?: string; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center px-6 py-10 text-center">
-      {icon && <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-brand-soft text-brand">{icon}</div>}
-      <h3 className="font-display text-lg font-bold">{title}</h3>
+      <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+        {icon && <span className="text-brand [&>svg]:size-5">{icon}</span>}
+        {title}
+      </h2>
       {text && <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-muted">{text}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
@@ -86,15 +98,17 @@ export function Label({ children, hint }: { children: ReactNode; hint?: string }
   );
 }
 
-export function Segmented<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: { value: T; label: string }[] }) {
+export function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { value: T; label: ReactNode }[]; label?: string }) {
   return (
-    <div className="flex rounded-2xl bg-surface-2 p-1">
+    <div className="flex rounded-2xl bg-surface-2 p-1" role="radiogroup" aria-label={label}>
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
+          role="radio"
+          aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold transition ${value === o.value ? 'bg-surface text-ink shadow-card' : 'text-muted'}`}
+          className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${value === o.value ? 'bg-surface text-ink shadow-card' : 'text-muted hover:text-ink'}`}
         >
           {o.label}
         </button>
@@ -124,9 +138,9 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative h-7 w-12 shrink-0 rounded-full transition ${checked ? 'bg-brand' : 'bg-surface-3'}`}
+        className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${checked ? 'bg-brand' : 'bg-surface-3'}`}
       >
-        <span className={`absolute top-1 size-5 rounded-full bg-white shadow transition-all ${checked ? 'left-6' : 'left-1'}`} />
+        <span className={`absolute left-1 top-1 size-5 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
       </button>
     </label>
   );

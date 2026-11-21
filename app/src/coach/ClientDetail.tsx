@@ -122,10 +122,10 @@ function Summary({ row, pick }: { row: Row; pick: (d: string) => void }) {
           <div className="space-y-2">
             {notes.map((n) => (
               <Card key={n.log_date} className="!py-4" onClick={() => pick(n.log_date)}>
-                <div className="flex items-center gap-2 text-xs font-bold text-muted">
+                <span className="flex items-center gap-2 text-xs font-bold text-muted">
                   <MessageSquareText className="size-3.5 text-brand" /> {pretty(n.log_date)}
-                </div>
-                <p className="mt-1.5 whitespace-pre-line text-sm">{n.day_notes}</p>
+                </span>
+                <span className="mt-1.5 block whitespace-pre-line text-sm">{n.day_notes}</span>
               </Card>
             ))}
           </div>
@@ -191,7 +191,7 @@ function Summary({ row, pick }: { row: Row; pick: (d: string) => void }) {
 function Stat({ value, label, tone }: { value: string; label: string; tone?: 'ok' | 'warn' }) {
   return (
     <div className="rounded-[22px] bg-surface p-4 shadow-card">
-      <div className={`font-display text-[26px] font-extrabold leading-none tracking-tight tnum ${tone === 'ok' ? 'text-brand' : tone === 'warn' ? 'text-carb' : ''}`}>{value}</div>
+      <div className={`font-display text-[26px] font-extrabold leading-none tracking-tight tnum ${tone === 'ok' ? 'text-brand' : tone === 'warn' ? 'text-carb-ink' : ''}`}>{value}</div>
       <div className="mt-1.5 text-xs font-semibold leading-tight text-muted">{label}</div>
     </div>
   );

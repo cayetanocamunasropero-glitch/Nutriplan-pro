@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Droplets, Loader2, MessageSquareText } from 'lucide-react';
+import { Droplets, Footprints, Loader2, MessageSquareText } from 'lucide-react';
 import { getLogs } from '../lib/data';
 import { pretty, shift, today } from '../lib/dates';
 import { entriesMacros, isFood, itemMacros, itemsMacros, n0, n1, planTarget, SLOTS, slotOf, unitOf } from '../lib/nutrition';
 import type { MealLog } from '../lib/types';
+import { findActivity } from '../client/Activity';
 import { Card, Empty } from '../ui/kit';
 import type { Row } from './CoachApp';
 
@@ -37,19 +38,28 @@ export function DiaryTab({ row, focus }: { row: Row; focus: string | null }) {
         food.forEach((e) => !slots.includes(slotOf(e)) && slots.push(slotOf(e)));
         return (
           <Card key={l.log_date} className="!p-0 scroll-mt-16">
-            <button id={'day-' + l.log_date} onClick={() => setOpen(isOpen ? null : l.log_date)} className="flex w-full items-center gap-3 px-5 py-4 text-left">
-              <div className="min-w-0 flex-1">
-                <div className="font-semibold">{pretty(l.log_date)}</div>
-                <div className="mt-0.5 text-xs text-muted tnum">
-                  HC {n0(t.c)} · P {n0(t.p)} · G {n0(t.f)} g{l.water_ml ? ` · ${n0(l.water_ml)} ml agua` : ''}
-                  {l.day_notes ? ' · 📝' : ''}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-display text-lg font-bold tnum">{n0(t.kcal)}</div>
-                {goal.kcal > 0 && <div className={`text-[11px] font-bold tnum ${Math.abs(pct - 1) <= 0.1 ? 'text-brand' : pct > 1.1 ? 'text-fat' : 'text-carb'}`}>{n0(pct * 100)} %</div>}
-              </div>
-            </button>
+            <h2 className="m-0">
+              <button
+                id={'day-' + l.log_date}
+                onClick={() => setOpen(isOpen ? null : l.log_date)}
+                aria-expanded={isOpen}
+                className="flex w-full items-center gap-3 px-5 py-4 text-left"
+              >
+                <span className="block min-w-0 flex-1">
+                  <span className="flex items-center gap-1.5 font-semibold">
+                    {pretty(l.log_date)}
+                    {l.day_notes ? <MessageSquareText className="size-3.5 text-brand" aria-label="Con nota" /> : null}
+                  </span>
+                  <span className="mt-0.5 block text-xs font-normal text-muted tnum">
+                    HC {n0(t.c)} · P {n0(t.p)} · G {n0(t.f)} g{l.water_ml ? ` · ${n0(l.water_ml)} ml agua` : ''}
+                  </span>
+                </span>
+                <span className="block text-right">
+                  <span className="block font-display text-lg font-bold tnum">{n0(t.kcal)}</span>
+                  {goal.kcal > 0 && <span className={`block text-[11px] font-bold tnum ${Math.abs(pct - 1) <= 0.1 ? 'text-brand' : pct > 1.1 ? 'text-fat-ink' : 'text-carb-ink'}`}>{n0(pct * 100)} %</span>}
+                </span>
+              </button>
+            </h2>
             {isOpen && (
               <div className="border-t border-line px-5 pb-4 pt-3">
                 {slots.map((s) => {
@@ -58,7 +68,7 @@ export function DiaryTab({ row, focus }: { row: Row; focus: string | null }) {
                   return (
                     <div key={s} className="mb-3">
                       <div className="mb-1 flex items-baseline justify-between">
-                        <h4 className="text-sm font-bold">{s}</h4>
+                        <h3 className="text-sm font-bold">{s}</h3>
                         <span className="text-xs font-semibold text-muted tnum">{n0(list.reduce((a, e) => a + itemsMacros(e.items).kcal, 0))} kcal</span>
                       </div>
                       {list.map((e, k) => (
@@ -78,6 +88,24 @@ export function DiaryTab({ row, focus }: { row: Row; focus: string | null }) {
                     </div>
                   );
                 })}
+                {(() => {
+                  const a = findActivity(l.entries || []);
+                  if (!a) return null;
+                  return (
+                    <div className="mb-2 flex gap-1.5 text-sm text-muted">
+                      <Footprints className="mt-0.5 size-4 shrink-0 text-brand" />
+                      <span>
+                        {a.steps != null && <b className="text-ink tnum">{n0(a.steps)} pasos</b>}
+                        {(a.activities || []).map((x, k) => (
+                          <span key={k} className="block">
+                            {x.type} · {x.minutes} min · {x.intensity}
+                            {x.note ? ' · ' + x.note : ''}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  );
+                })()}
                 {l.water_ml ? (
                   <p className="flex items-center gap-1.5 text-sm text-muted">
                     <Droplets className="size-4 text-water" /> {n0(l.water_ml)} ml
