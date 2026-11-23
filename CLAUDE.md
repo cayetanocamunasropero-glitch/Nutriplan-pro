@@ -38,6 +38,16 @@ La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la
 - **GitHub Pages** (vista previa): `.github/workflows/pages.yml` publica `app/dist` en cada push a `main` o a la rama de trabajo → `https://cayetanocamunasropero-glitch.github.io/Nutriplan-pro/`. Requiere Settings → Pages → Source «GitHub Actions». Sin servidor: el buscador llama directo a Open Food Facts y `/clasica` no existe allí.
 - La app usa rutas relativas (`base: './'`), funciona en raíz o en subcarpeta.
 Vercel team `team_CNO0OyROIW0IYun3Vrwgzak8`, proyecto `prj_8XKbo9Zs5S2h3IhsNrzC3ZZ4VsdF` (nutriplan-asesoria). Publicar en producción **solo con el OK explícito de Cayetano** (la usan clientes reales). Probar antes en una vista previa.
+- **Producción = NutriPlan 2 desde el 23 nov 2026** (`nutriplan-asesoria.vercel.app`, commit `3820ff5`). Rollback: `dpl_2tyG5ikFoaRERBQg9TCbSGyTS2f8` (versión clásica anterior).
+- GitHub está conectado a Vercel (Root Directory `app`, framework Vite). **Protección:** «Ignored Build Step» = `[ "$VERCEL_ENV" = "production" ] && exit 0 || exit 1`. Cada push a `main` intenta publicar en producción y Vercel lo cancela; las ramas generan vistas previas.
+- **Publicar (MCP de Vercel):**
+  1. vista previa con `create_deployment` (`gitSource` `main`@sha) → comprobar en `nutriplan-asesoria-git-main-cayetanocamunasropero-8425.vercel.app` (app, `/clasica`, `/api/foods`, APK simulada con `file://`);
+  2. `update_project` con `commandForIgnoringBuildStep: null`;
+  3. `create_deployment` del mismo sha con `target: "production"` y esperar a READY;
+  4. volver a poner la protección **en seguida**;
+  5. verificar producción.
+- Entorno de Claude «Nutriplan-pro»: hosts `*.github.io` de la vista previa, `nutriplan-asesoria(-git-main…).vercel.app`, `world/search.openfoodfacts.org` y un token de Vercel (la CLI está enlazada en `app/.vercel/`, ignorada por git). Node necesita `NODE_USE_ENV_PROXY=1` para salir a internet.
+- `/api/foods` busca con `search.openfoodfacts.org` (productos de España primero); OFF bloquea `/cgi/search.pl` desde Vercel. El navegador usa `search.pl` como respaldo (el buscador nuevo no admite CORS).
 
 ## Diseño (tokens en `app/src/index.css`; decisión en `.impeccable/surfaces/app-src.md`, producto en `PRODUCT.md`)
 - Look «Menú del día + Información nutricional» (elegido por Cayetano, nov 2026): cabeceras y navegación en pizarra (`bg-board`, `text-chalk`, `<BoardHeader>`), contenido en papel claro con tinta (`border-rule`), acento mostaza (`bg-accent`, botón «+»), Barlow Condensed rotulada (`caps`) para títulos/cifras/botones y Barlow para texto. Oscuro = pizarra completa.
