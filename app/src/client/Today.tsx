@@ -4,28 +4,32 @@ import { ChevronLeft, ChevronRight, CloudCheck, Copy, Droplets, Flame, Loader2, 
 import { getLogs } from '../lib/data';
 import { lastDays, pretty, shift, today, weekdayLetter } from '../lib/dates';
 import { entriesMacros, itemMacros, itemsMacros, n0, n1, planTarget, SLOTS, slotForNow, slotOf, isFood, unitOf } from '../lib/nutrition';
-import type { Food, LogEntry, LogItem, MealLog, PublishedPlan } from '../lib/types';
+import type { Food, LogEntry, LogItem, MealLog, PlanGroup, PlanOption, PublishedPlan } from '../lib/types';
+import { eachItem, kitDefault, kitLabel, optionItems } from '../lib/plan';
 import { BoardHeader, NutriScore } from '../ui/Board';
 import { Button, Card } from '../ui/kit';
 import { Sheet } from '../ui/Sheet';
 import { useToast } from '../ui/Toast';
 import { AddFood, PortionStep } from './AddFood';
 import { useDay } from './useDay';
-import { planGroups } from './PlanView';
+import { planGroups, toLog } from './PlanView';
 import { ActivityCard, findActivity } from './Activity';
 import { Tips } from './Tips';
 
 export function planFoodsOf(plan: PublishedPlan): Food[] {
   const out: Food[] = [];
   const seen = new Set<string>();
+  const add = (x: { name: string; kcal: number; c: number; p: number; f: number; grams: number }) => {
+    if (x?.name && !seen.has(x.name) && isFinite(+x.kcal)) {
+      seen.add(x.name);
+      out.push({ name: x.name, kcal: +x.kcal, c: +x.c || 0, p: +x.p || 0, f: +x.f || 0, portion: +x.grams || 100, portionLabel: 'según tu plan', source: 'Tu plan' });
+    }
+  };
   for (const g of planGroups(plan))
-    for (const o of g.options || [])
-      for (const it of o.items || [])
-        for (const x of [it, ...(it.choices || []), ...(it.alternatives || [])])
-          if (x?.name && !seen.has(x.name) && isFinite(+x.kcal)) {
-            seen.add(x.name);
-            out.push({ name: x.name, kcal: +x.kcal, c: +x.c || 0, p: +x.p || 0, f: +x.f || 0, portion: +x.grams || 100, portionLabel: 'según tu plan', source: 'Tu plan' });
-          }
+    for (const o of g.options || []) {
+      for (const it of o.items || []) [it, ...(it.alternatives || [])].forEach(add);
+      eachItem(o, add); // intercambios y alimentos de las combinaciones (wraps, pizzas)
+    }
   return out;
 }
 
@@ -40,6 +44,17 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
   const tot = entriesMacros(d.entries);
   const left = goal.kcal - tot.kcal;
   const planFoods = useMemo(() => planFoodsOf(plan), [plan]);
+  const planBySlot = useMemo(() => new Map(planGroups(plan).map((g) => [slotOf({ meal: g.name }), g])), [plan]);
+
+  // Registrar una opción del plan desde «Hoy», con un toque (las combinaciones se eligen en «Mi plan»)
+  function logOption(g: PlanGroup, o: PlanOption) {
+    const at = new Date().toISOString();
+    const entry: LogEntry = { meal: g.name, letter: o.letter, status: 'completed', items: optionItems(o).map(toLog), ...(o.kit ? { combo: kitLabel(o.kit, kitDefault(o.kit)) } : {}), updatedAt: at };
+    d.update((s) => ({ ...s, entries: [...s.entries.filter((e) => e.freeEntry || e.kind === 'activity' || e.meal !== g.name), entry] }));
+    toast(`${g.name}: opción ${o.letter} registrada`, {
+      action: { label: 'Deshacer', run: () => d.update((s) => ({ ...s, entries: s.entries.filter((e) => !(e.meal === g.name && !e.freeEntry && e.updatedAt === at)) })) },
+    });
+  }
   const strip = lastDays(day > shift(today(), -3) ? today() : shift(day, 3), 7);
 
   useEffect(() => {
@@ -276,6 +291,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                       </AnimatePresence>
                     </ul>
                   ) : minor ? null : (
+                    <>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <p className="mr-auto text-sm text-faint">Sin anotar</p>
                       {hasYesterday && (
@@ -289,6 +305,28 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                         </button>
                       )}
                     </div>
+                    {(() => {
+                      const g = planBySlot.get(slot);
+                      if (!g?.options?.length) return null;
+                      return (
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                          <span className="mr-0.5 text-[13px] text-muted">Del plan:</span>
+                          {g.options.map((o) => {
+                            const k = itemsMacros(optionItems(o).map(toLog)).kcal;
+                            return o.kit ? (
+                              <button key={o.letter} onClick={goPlan} className="h-9 rounded-full border-2 border-line px-3 text-[14px] font-semibold text-muted hover:border-rule hover:text-ink" aria-label={`Elegir la opción ${o.letter} de ${g.name} en «Mi plan»`}>
+                                <span className="caps text-[16px] text-ink">{o.letter}</span> · elegir
+                              </button>
+                            ) : (
+                              <button key={o.letter} onClick={() => logOption(g, o)} className="h-9 rounded-full border-2 border-rule px-3 text-[14px] font-semibold tnum transition-transform active:scale-95" aria-label={`Registrar opción ${o.letter} de ${g.name} (${n0(k)} kcal)`}>
+                                <span className="caps text-[16px]">{o.letter}</span> · {n0(k)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
+                    </>
                   )}
                 </section>
               );

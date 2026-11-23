@@ -117,6 +117,17 @@ async function login(p, email) {
   ok(act && act.steps === 9200 && act.activities[0].type === 'Pádel · Partido' && act.meal === '__actividad_y_pasos', 'pasos y actividad guardados en formato clásico');
   ok(log.entries.filter((e) => e.kind === 'activity').length === 1, 'una sola entrada de actividad por día');
 
+  // Registrar una opción del plan desde «Hoy» con un toque, y deshacer
+  await p.getByRole('button', { name: /Registrar opción A de Desayuno/ }).click();
+  await p.waitForTimeout(700);
+  log = L();
+  const quick = log.entries.find((e) => e.meal === 'Desayuno' && !e.freeEntry);
+  ok(quick && quick.letter === 'A' && quick.items.length === 3 && quick.items.every((i) => i.source === 'Tu plan'), 'opción del plan registrada desde «Hoy» con un toque');
+  await p.getByRole('button', { name: 'Deshacer' }).last().click();
+  await p.waitForTimeout(700);
+  log = L();
+  ok(!log.entries.some((e) => e.meal === 'Desayuno' && !e.freeEntry), 'deshacer el registro rápido del plan');
+
   // Plan
   await p.getByRole('button', { name: 'Mi plan', exact: true }).click();
   await p.getByRole('heading', { name: 'Mi plan' }).waitFor();
