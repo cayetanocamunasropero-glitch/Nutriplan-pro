@@ -49,7 +49,7 @@ async function login(p, email) {
   await p.waitForTimeout(400);
   await p.screenshot({ path: `${OUT}/01-login.png` });
   await login(p, 'cliente@example.com');
-  await p.getByText('kcal restantes').waitFor();
+  await p.getByText('Te quedan').first().waitFor();
   ok(await p.getByRole('heading', { name: 'Mario' }).isVisible(), 'saludo con el nombre del cuestionario');
   await p.waitForTimeout(700);
   await p.screenshot({ path: `${OUT}/02-hoy-vacio.png` });
@@ -77,7 +77,7 @@ async function login(p, email) {
   ok(log && log.entries.length === 2, 'dos alimentos guardados en nutriplan_meal_logs');
   ok(log && log.entries.every((e) => e.freeEntry && e.mealSlot === 'Comida' && e.items[0].grams > 0), 'formato de entrada compatible (freeEntry/mealSlot/items)');
   // 260 kcal arroz + 98 pollo = 358
-  ok(await p.getByText('358 / 2300').isVisible(), 'anillo muestra 358 / 2300 kcal');
+  ok(await p.getByText('358 / 2300').isVisible(), 'resumen muestra 358 / 2300 kcal');
 
   // Agua
   await p.getByRole('button', { name: 'Añadir 250 ml' }).click();
@@ -122,7 +122,7 @@ async function login(p, email) {
   await p.getByRole('heading', { name: 'Mi plan' }).waitFor();
   await p.waitForTimeout(500);
   await p.screenshot({ path: `${OUT}/06-plan.png`, fullPage: true });
-  await p.getByRole('button', { name: 'B', exact: true }).click();
+  await p.getByRole('tab', { name: 'B', exact: true }).click();
   await p.getByRole('button', { name: 'Registrar' }).first().click();
   await p.waitForTimeout(800);
   log = L();
@@ -175,7 +175,7 @@ async function login(p, email) {
   await p.screenshot({ path: `${OUT}/10-cuestionario-oscuro.png` });
   for (let i = 0; i < 3; i++) await p.getByRole('button', { name: 'Continuar' }).click();
   await p.getByRole('button', { name: 'Empezar' }).click();
-  await p.getByText('kcal restantes').waitFor();
+  await p.getByText('Te quedan').first().waitFor();
   ok(db.nutriplan_client_onboarding[0]?.completed_at, 'cuestionario guardado y completado');
   await p.waitForTimeout(700);
   await p.screenshot({ path: `${OUT}/11-hoy-oscuro.png` });

@@ -5,6 +5,7 @@ import { pretty } from '../lib/dates';
 import { itemMacros, itemsMacros, n0, n1, planTarget, unitOf } from '../lib/nutrition';
 import type { LogEntry, LogItem, PlanGroup, PlanOption, PlanOptionItem, PublishedPlan } from '../lib/types';
 import { Button, Card, Empty } from '../ui/kit';
+import { BoardHeader } from '../ui/Board';
 import { Sheet } from '../ui/Sheet';
 import { useToast } from '../ui/Toast';
 import { useDay } from './useDay';
@@ -64,23 +65,18 @@ export function PlanView({ plan, uid, day, onError, goToday }: { plan: Published
   }
 
   return (
-    <div className="px-4 pt-6">
-      <header className="px-1">
-        <h1 className="font-display text-[30px] font-extrabold leading-tight tracking-tight">Mi plan</h1>
-        <p className="mt-0.5 text-sm text-muted">{plan.content?.title || 'Plan de ' + (plan.client_name || '')}</p>
+    <div className="px-4">
+      <BoardHeader title="Mi plan" subtitle={(plan.content?.title || 'Plan de ' + (plan.client_name || '')) + (goal.kcal > 0 ? ` · ${n0(goal.kcal)} kcal/día` : '')}>
         {goal.kcal > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold">
-            <span className="rounded-full bg-ink px-3 py-1.5 text-bg tnum">{n0(goal.kcal)} kcal/día</span>
-            <span className="rounded-full bg-surface px-3 py-1.5 text-muted shadow-card tnum">HC {n0(goal.c)} g</span>
-            <span className="rounded-full bg-surface px-3 py-1.5 text-muted shadow-card tnum">P {n0(goal.p)} g</span>
-            <span className="rounded-full bg-surface px-3 py-1.5 text-muted shadow-card tnum">G {n0(goal.f)} g</span>
-          </div>
+          <p className="mt-3 text-sm text-chalk-dim tnum">
+            Objetivo: HC {n0(goal.c)} g · P {n0(goal.p)} g · G {n0(goal.f)} g
+          </p>
         )}
-        <p className="mt-3 text-sm text-muted">
-          Elige la opción que vas a comer y pulsa <b className="text-ink">Registrar</b>. Se anotará en <b className="text-ink">{pretty(day).toLowerCase()}</b>.
-        </p>
-      </header>
-      <div className="mt-5 space-y-4">
+      </BoardHeader>
+      <p className="mt-4 px-1 text-sm text-muted">
+        Elige una opción de cada comida y pulsa <b className="text-ink">Registrar</b>. Se anotará en <b className="text-ink">{pretty(day).toLowerCase()}</b>.
+      </p>
+      <div className="mt-3 space-y-3">
         {groups.map((g) => (
           <GroupCard key={g.name} g={g} logged={d.entries.find((e) => !e.freeEntry && e.kind !== 'activity' && e.meal === g.name)} onLog={(o) => log(g, o, o.items.map(toLog))} onAdjust={(o) => setAdjust({ g, o })} onUndo={() => unlog(g)} />
         ))}
@@ -99,57 +95,65 @@ function GroupCard({ g, logged, onLog, onAdjust, onUndo }: { g: PlanGroup; logge
   const isLogged = logged && logged.letter === o.letter;
   return (
     <Card className="!p-0 overflow-hidden">
-      <div className="flex items-center justify-between px-5 pt-4">
-        <h2 className="font-display text-xl font-bold">{g.name}</h2>
+      <div className="flex items-center justify-between gap-3 px-5 pt-4">
+        <h2 className="caps text-[24px] leading-none">{g.name}</h2>
         {logged && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand">
-            <Check className="size-3.5" /> Opción {logged.letter}
+          <span className="caps inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-0.5 text-[15px] text-go">
+            <Check className="size-4" /> Opción {logged.letter}
           </span>
         )}
       </div>
       {opts.length > 1 && (
-        <div className="no-scrollbar mt-3 flex gap-1.5 overflow-x-auto px-5">
+        <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto px-5" role="tablist" aria-label={'Opciones de ' + g.name}>
           {opts.map((x, i) => (
-            <button key={x.letter + i} onClick={() => setSel(i)} className={`relative h-9 min-w-9 shrink-0 rounded-xl px-3 text-sm font-bold transition ${i === sel ? 'text-bg' : 'bg-surface-2 text-muted'}`}>
-              {i === sel && <motion.span layoutId={'opt' + g.name} className="absolute inset-0 rounded-xl bg-ink" />}
+            <button
+              key={x.letter + i}
+              role="tab"
+              aria-selected={i === sel}
+              onClick={() => setSel(i)}
+              className={`caps relative grid h-10 min-w-10 shrink-0 place-items-center rounded-[10px] border-2 border-rule px-3 text-[19px] transition-colors ${i === sel ? 'text-on-brand' : 'text-ink'}`}
+            >
+              {i === sel && <motion.span layoutId={'opt' + g.name} className="absolute -inset-0.5 rounded-[10px] bg-brand" transition={{ type: 'spring', duration: 0.3, bounce: 0 }} />}
               <span className="relative">{x.letter}</span>
             </button>
           ))}
         </div>
       )}
       <div className="px-5 pb-4 pt-3">
-        {o.title && o.title !== g.name && <p className="mb-2 text-sm font-semibold">{o.title}</p>}
-        <ul className="space-y-1.5">
+        {o.title && o.title !== g.name && <p className="mb-1 text-[15px] font-semibold">{o.title}</p>}
+        <ul>
           {o.items.map((it, i) => (
-            <li key={i} className="flex items-baseline justify-between gap-3 text-sm">
-              <span className="min-w-0">
+            <li key={i} className="flex items-baseline gap-2 py-1.5 text-[16px]">
+              <span className="min-w-0 shrink">
                 {it.name}
-                {(it.choices?.length || it.alternatives?.length) ? <span className="ml-1 text-xs text-brand">· intercambiable</span> : null}
+                {it.choices?.length || it.alternatives?.length ? <span className="text-[13px] font-semibold text-go"> · intercambiable</span> : null}
+                {typeof it.portion === 'string' && it.portion && <span className="block text-[13px] text-muted">{it.portion}</span>}
               </span>
-              <span className="shrink-0 font-semibold text-muted tnum">
+              <span className="leader" aria-hidden />
+              <span className="shrink-0 font-display text-[19px] font-bold tnum">
                 {n1(it.grams)} {it.unit || unitOf(it.name)}
               </span>
             </li>
           ))}
         </ul>
-        {o.notes && <p className="mt-3 rounded-2xl bg-surface-2 p-3 text-xs leading-relaxed text-muted">{o.notes}</p>}
-        <div className="mt-4 flex items-center gap-2">
-          <div className="flex-1 text-sm">
-            <b className="font-display text-lg tnum">{n0(m.kcal)}</b> <span className="text-muted">kcal</span>
-            <div className="text-[11px] text-muted tnum">
-              HC {n0(m.c)} · P {n0(m.p)} · G {n0(m.f)}
-            </div>
-          </div>
+        {o.notes && <p className="mt-3 rounded-[10px] bg-surface-2 p-3 text-[13px] leading-relaxed text-muted">{o.notes}</p>}
+        <div className="mt-3 flex items-center justify-between gap-3 border-t-[3px] border-rule pt-2.5">
+          <span className="text-[13px] text-muted tnum">
+            HC {n0(m.c)} · P {n0(m.p)} · G {n0(m.f)} g
+          </span>
+          <span className="font-display text-[24px] font-extrabold leading-none tnum">{n0(m.kcal)} kcal</span>
+        </div>
+        <div className="mt-3 flex items-center justify-end gap-2">
           {isLogged ? (
             <Button variant="soft" size="sm" onClick={onUndo} icon={<Undo2 className="size-4" />}>
               Quitar
             </Button>
           ) : (
             <>
-              <button onClick={() => onAdjust(o)} className="grid size-10 place-items-center rounded-full bg-surface-2 text-muted" aria-label="Ajustar cantidades">
+              <button onClick={() => onAdjust(o)} className="grid size-10 place-items-center rounded-full border-2 border-line text-muted hover:border-rule hover:text-ink" aria-label="Ajustar cantidades">
                 <SlidersHorizontal className="size-4.5" />
               </button>
-              <Button size="sm" onClick={() => onLog(o)} icon={<Check className="size-4" />}>
+              <Button size="md" onClick={() => onLog(o)} icon={<Check className="size-4.5" />}>
                 Registrar
               </Button>
             </>
@@ -175,11 +179,11 @@ function Adjust({ target, onClose, onLog }: { target: { g: PlanGroup; o: PlanOpt
         {items.map((it, i) => {
           const ch = choices(i);
           return (
-            <li key={i} className="flex items-center gap-2 rounded-2xl bg-surface-2 p-2 pl-3">
+            <li key={i} className="flex items-center gap-2 rounded-[12px] bg-surface-2 p-2 pl-3">
               <div className="min-w-0 flex-1">
                 {ch.length > 1 ? (
                   <select
-                    className="w-full truncate bg-transparent text-sm font-semibold outline-none"
+                    className="w-full truncate bg-transparent text-[16px] font-semibold outline-none"
                     value={it.name}
                     onChange={(e) => {
                       const x = ch.find((c) => c.name === e.target.value)!;
@@ -196,7 +200,7 @@ function Adjust({ target, onClose, onLog }: { target: { g: PlanGroup; o: PlanOpt
                 <div className="text-[11px] text-muted tnum">{n0(itemMacros(it).kcal)} kcal</div>
               </div>
               <input
-                className="h-10 w-20 rounded-xl bg-surface text-center text-sm font-bold outline-none tnum"
+                className="h-10 w-20 rounded-[10px] border-2 border-line bg-surface text-center text-[16px] font-bold outline-none tnum focus:border-rule"
                 inputMode="decimal"
                 value={it.grams}
                 onChange={(e) => setItems(items.map((y, k) => (k === i ? { ...y, grams: Math.max(0, Math.min(2500, Number(e.target.value.replace(',', '.')) || 0)) } : y)))}
@@ -207,7 +211,7 @@ function Adjust({ target, onClose, onLog }: { target: { g: PlanGroup; o: PlanOpt
           );
         })}
       </ul>
-      <div className="mt-4 flex items-center justify-between rounded-2xl bg-ink px-4 py-3 text-bg">
+      <div className="mt-4 flex items-center justify-between rounded-[12px] bg-ink px-4 py-3 text-bg">
         <span className="text-sm">Total</span>
         <span className="font-display text-lg font-bold tnum">
           {n0(tot.kcal)} kcal <span className="text-xs font-semibold opacity-70">HC {n0(tot.c)} · P {n0(tot.p)} · G {n0(tot.f)}</span>

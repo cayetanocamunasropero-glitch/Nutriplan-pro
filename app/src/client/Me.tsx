@@ -7,6 +7,7 @@ import { n0, planTarget } from '../lib/nutrition';
 import type { PublishedPlan } from '../lib/types';
 import { Card, SectionTitle, Segmented } from '../ui/kit';
 import { signOut } from '../App';
+import { BoardHeader } from '../ui/Board';
 
 export function Me({ session, plan, form, editSurvey }: { session: Session; plan: PublishedPlan; form: Record<string, string>; editSurvey: () => void }) {
   const [theme, setTheme] = useTheme();
@@ -14,24 +15,35 @@ export function Me({ session, plan, form, editSurvey }: { session: Session; plan
   const goal = planTarget(plan.content);
   const full = [form.firstName, form.lastName].filter(Boolean).join(' ') || plan.client_name || 'Tu perfil';
   return (
-    <div className="px-4 pt-6">
-      <div className="flex items-center gap-4 px-1">
-        <span className="grid size-16 place-items-center rounded-[22px] bg-brand font-display text-2xl font-extrabold text-on-brand">{full.trim().charAt(0).toUpperCase()}</span>
-        <div className="min-w-0">
-          <h1 className="truncate font-display text-2xl font-extrabold tracking-tight">{full}</h1>
-          <p className="truncate text-sm text-muted">{session.user.email}</p>
-        </div>
-      </div>
+    <div className="px-4">
+      <BoardHeader
+        title={full}
+        subtitle={session.user.email}
+        right={<span className="caps grid size-12 place-items-center rounded-full bg-accent text-[24px] text-on-accent">{full.trim().charAt(0).toUpperCase()}</span>}
+      />
 
       {goal.kcal > 0 && (
-        <Card tone="brand" className="mt-5">
-          <p className="text-sm font-semibold opacity-85">Tu objetivo diario</p>
-          <p className="mt-1 font-display text-4xl font-extrabold tracking-tight tnum">{n0(goal.kcal)} kcal</p>
-          <p className="mt-2 text-sm opacity-80 tnum">
-            HC {n0(goal.c)} g · Proteínas {n0(goal.p)} g · Grasas {n0(goal.f)} g
-          </p>
-          <p className="mt-3 text-xs opacity-80">Lo ajusta tu coach según tu evolución.</p>
-        </Card>
+        <section className="mt-4 rounded-[8px] border-[3px] border-rule bg-surface px-4 py-3" aria-labelledby="goal-title">
+          <h2 id="goal-title" className="caps text-[22px] leading-none">
+            Tu objetivo diario
+          </h2>
+          <div className="mt-2 h-2 bg-rule" aria-hidden />
+          <p className="mt-2 font-display text-[44px] font-extrabold leading-none tnum">{n0(goal.kcal)} kcal</p>
+          <div className="mt-2 h-[3px] bg-rule" aria-hidden />
+          {(
+            [
+              ['Hidratos', goal.c],
+              ['Proteínas', goal.p],
+              ['Grasas', goal.f],
+            ] as const
+          ).map(([l, v], i) => (
+            <div key={l} className={`flex justify-between py-1.5 text-[15px] tnum ${i ? 'border-t border-rule' : ''}`}>
+              <b className="font-semibold">{l}</b>
+              <span>{n0(v)} g</span>
+            </div>
+          ))}
+          <p className="mt-2 text-xs text-muted">Lo ajusta tu coach según tu evolución.</p>
+        </section>
       )}
 
       <SectionTitle>Apariencia</SectionTitle>
@@ -65,7 +77,7 @@ export function Me({ session, plan, form, editSurvey }: { session: Session; plan
 
 function Row({ icon, label, onClick, danger }: { icon: ReactNode; label: string; onClick: () => void; danger?: boolean }) {
   return (
-    <button onClick={onClick} className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3.5 text-left text-[15px] font-semibold hover:bg-surface-2 ${danger ? 'text-danger' : ''}`}>
+    <button onClick={onClick} className={`flex w-full items-center gap-3 rounded-[12px] px-3 py-3.5 text-left text-[15px] font-semibold hover:bg-surface-2 ${danger ? 'text-danger' : ''}`}>
       <span className={danger ? '' : 'text-brand'}>{icon}</span>
       {label}
     </button>

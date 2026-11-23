@@ -23,7 +23,7 @@ export function AccessTab({ row, reload, toast }: { row: Row; reload: () => void
         <div className="flex items-start gap-3">
           <CheckCircle2 className="mt-0.5 size-6 shrink-0 text-ok" />
           <div>
-            <h3 className="font-display text-lg font-bold">{first || 'El cliente'} ya usa la app</h3>
+            <h3 className="caps text-lg">{first || 'El cliente'} ya usa la app</h3>
             <p className="mt-1 text-sm text-muted">Su cuenta está vinculada. Todo lo que publiques le llegará al momento, sin reinstalar nada.</p>
           </div>
         </div>
@@ -34,11 +34,11 @@ export function AccessTab({ row, reload, toast }: { row: Row; reload: () => void
     <>
       <Card>
         <div className="flex items-start gap-3">
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand">
+          <span className="grid size-11 shrink-0 place-items-center rounded-[12px] bg-brand-soft text-brand">
             <KeyRound className="size-5" />
           </span>
           <div>
-            <h3 className="font-display text-lg font-bold">Invitar por WhatsApp</h3>
+            <h3 className="caps text-lg">Invitar por WhatsApp</h3>
             <p className="mt-1 text-sm text-muted">Generamos un código de un solo uso (7 días). No necesitas su correo. Si generas otro, el anterior deja de valer.</p>
           </div>
         </div>
@@ -63,7 +63,7 @@ export function AccessTab({ row, reload, toast }: { row: Row; reload: () => void
           </Button>
         ) : (
           <>
-            <div className="mt-4 rounded-2xl bg-ink p-4 text-center font-mono text-xl font-bold tracking-wider text-lime">{code}</div>
+            <div className="mt-4 rounded-[12px] bg-ink p-4 text-center font-mono text-xl font-bold tracking-wider text-accent">{code}</div>
             <label className="mt-4 block">
               <Label hint="opcional">Teléfono con prefijo</Label>
               <input className="field tnum" inputMode="tel" placeholder="34600111222" value={phone} onChange={(e) => setPhone(e.target.value)} />

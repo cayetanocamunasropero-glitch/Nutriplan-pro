@@ -81,7 +81,7 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
     <>
       <Card className="border-2 border-dashed border-line !bg-transparent !shadow-none">
         <label className="flex cursor-pointer flex-col items-center gap-2 py-4 text-center">
-          <span className="grid size-12 place-items-center rounded-2xl bg-brand-soft text-brand">
+          <span className="grid size-12 place-items-center rounded-[12px] bg-brand-soft text-brand">
             <FileUp className="size-6" />
           </span>
           <b>{busy ? 'Leyendo el PDF…' : 'Importar dieta en PDF'}</b>
@@ -114,7 +114,7 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
             return (
               <Card key={g.name} className="!py-4">
                 <div className="flex items-baseline justify-between">
-                  <h3 className="font-display text-lg font-bold">{g.name}</h3>
+                  <h3 className="caps text-lg">{g.name}</h3>
                   {goal > 0 && <span className="text-xs text-muted tnum">{n0(g.share)} % · ≈{n0(goal)} kcal</span>}
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">
@@ -194,7 +194,7 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
           Cancelar
         </Button>
       </div>
-      <div className={`mt-3 flex items-start gap-2 rounded-2xl p-3 text-sm ${bad ? 'bg-carb/12 text-carb-ink' : 'bg-brand-soft text-brand'}`}>
+      <div className={`mt-3 flex items-start gap-2 rounded-[12px] p-3 text-sm ${bad ? 'bg-carb/12 text-carb-ink' : 'bg-brand-soft text-brand'}`}>
         {bad ? <AlertTriangle className="mt-0.5 size-4 shrink-0" /> : <CheckCircle2 className="mt-0.5 size-4 shrink-0" />}
         <span>
           {draft.report ? draft.report.replace(/\.?$/, '. ') : ''}

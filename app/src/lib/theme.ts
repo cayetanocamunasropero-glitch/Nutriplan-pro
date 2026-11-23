@@ -10,7 +10,7 @@ function resolve(t: Theme) {
 export function applyTheme(t: Theme) {
   const r = resolve(t);
   document.documentElement.dataset.theme = r;
-  document.querySelector('meta[name=theme-color]')?.setAttribute('content', r === 'dark' ? '#0b1210' : '#f3f2ec');
+  document.querySelector('meta[name=theme-color]')?.setAttribute('content', r === 'dark' ? '#0a110d' : '#17231d');
 }
 
 export function getTheme(): Theme {

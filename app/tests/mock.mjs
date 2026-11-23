@@ -162,10 +162,10 @@ export async function install(page, db, { uid }) {
   await page.route('**/api/foods**', (route) => {
     const u = new URL(route.request().url());
     if (u.searchParams.get('barcode'))
-      return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ product: { code: u.searchParams.get('barcode'), product_name: 'Yogur griego ligero', brands: 'Hacendado', nutriments: { 'energy-kcal_100g': 70, carbohydrates_100g: 4, proteins_100g: 8, fat_100g: 2.5 }, serving_size: '125 g' } }) });
+      return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ product: { code: u.searchParams.get('barcode'), product_name: 'Yogur griego ligero', brands: 'Hacendado', nutriscore_grade: 'a', nutriments: { 'energy-kcal_100g': 70, carbohydrates_100g: 4, proteins_100g: 8, fat_100g: 2.5 }, serving_size: '125 g' } }) });
     return route.fulfill({
       contentType: 'application/json',
-      body: JSON.stringify({ products: [{ code: '842', product_name: 'Pechuga de pollo en lonchas', brands: 'Hacendado', nutriments: { 'energy-kcal_100g': 98, carbohydrates_100g: 1.5, proteins_100g: 21, fat_100g: 1.2 } }] }),
+      body: JSON.stringify({ products: [{ code: '842', product_name: 'Pechuga de pollo en lonchas', brands: 'Hacendado', nutriscore_grade: 'b', nutriments: { 'energy-kcal_100g': 98, carbohydrates_100g: 1.5, proteins_100g: 21, fat_100g: 1.2 } }] }),
     });
   });
   return writes;

@@ -42,7 +42,7 @@ export function Sheet({ open, onClose, title, children, full }: { open: boolean;
             onClick={onClose}
           />
           <motion.div
-            className={`relative flex w-full flex-col overflow-hidden rounded-t-[30px] bg-surface shadow-pop sm:max-w-lg sm:rounded-[30px] ${full ? 'h-[92dvh] sm:h-[86dvh]' : 'max-h-[92dvh]'}`}
+            className={`relative flex w-full flex-col overflow-hidden rounded-t-[20px] border-t-2 border-rule bg-surface shadow-pop sm:max-w-lg sm:rounded-[20px] sm:border-2 ${full ? 'h-[92dvh] sm:h-[86dvh]' : 'max-h-[92dvh]'}`}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -59,7 +59,7 @@ export function Sheet({ open, onClose, title, children, full }: { open: boolean;
             </div>
             {title !== undefined && (
               <div className="flex shrink-0 touch-none items-center justify-between gap-3 px-5 pb-2 pt-2 sm:pt-4" onPointerDown={startDrag}>
-                <h2 id={titleId} className="font-display text-xl font-bold tracking-tight">
+                <h2 id={titleId} className="caps text-[24px] leading-none">
                   {title}
                 </h2>
                 <button

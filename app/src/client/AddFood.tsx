@@ -8,6 +8,7 @@ import { Sheet } from '../ui/Sheet';
 import { Button, Chip, Label, MacroDots } from '../ui/kit';
 import { useToast } from '../ui/Toast';
 import { Scanner } from './Scanner';
+import { NutriScore } from '../ui/Board';
 
 type Step = { k: 'search' } | { k: 'scan' } | { k: 'manual' } | { k: 'portion'; food: Food; grams?: number };
 
@@ -125,7 +126,7 @@ function SearchStep({ planFoods, pick, scan, manual, added, done }: { planFoods:
         <div className="relative">
           <Search className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-faint" />
           <input ref={input} className="field h-13 pl-12 pr-24 text-[16px]" placeholder="Busca: pollo, avena, yogur…" value={q} onChange={(e) => setQ(e.target.value)} enterKeyHint="search" />
-          <button onClick={scan} className="absolute right-1.5 top-1/2 flex h-10 -translate-y-1/2 items-center gap-1.5 rounded-xl bg-ink px-3 text-sm font-semibold text-bg" aria-label="Escanear código de barras">
+          <button onClick={scan} className="absolute right-1.5 top-1/2 caps flex h-10 -translate-y-1/2 items-center gap-1.5 rounded-full bg-brand px-3.5 text-[15px] text-on-brand" aria-label="Escanear código de barras">
             <Barcode className="size-4.5" /> Escanear
           </button>
         </div>
@@ -150,7 +151,7 @@ function SearchStep({ planFoods, pick, scan, manual, added, done }: { planFoods:
             </Chip>
           </div>
           <FoodList foods={lists[tab]} pick={pick} empty={tab === 'fav' ? 'Marca con ♥ los alimentos que más uses.' : tab === 'recent' ? 'Aquí aparecerá lo que vayas añadiendo.' : ''} />
-          <button onClick={manual} className="mt-4 flex w-full items-center gap-3 rounded-2xl border border-dashed border-line p-4 text-left text-sm text-muted hover:bg-surface-2">
+          <button onClick={manual} className="mt-4 flex w-full items-center gap-3 rounded-[12px] border border-dashed border-line p-4 text-left text-sm text-muted hover:bg-surface-2">
             <PenLine className="size-5 text-brand" />
             <span>
               <b className="block text-ink">Crear alimento personalizado</b>
@@ -201,7 +202,10 @@ function FoodList({ foods, pick, empty }: { foods: Food[]; pick: (f: Food) => vo
         <li key={(f.id || f.name) + i}>
           <button onClick={() => pick(f)} className="flex w-full items-center gap-3 py-3 text-left">
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[15px] font-semibold">{f.name}</div>
+              <div className="truncate text-[16px] font-semibold">
+                {f.name}
+                <NutriScore grade={f.nutriscore} />
+              </div>
               <div className="mt-0.5 flex items-center gap-2 text-xs text-muted">
                 {f.brand && <span className="truncate">{f.brand} ·</span>}
                 <span className="tnum">{n0(f.kcal)} kcal/100</span>
@@ -294,7 +298,7 @@ export function PortionStep({ food, initial, add, cta = 'Añadir' }: { food: Foo
     <div>
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="font-display text-2xl font-bold leading-tight tracking-tight">{food.name}</h3>
+          <h3 className="caps text-2xl leading-tight">{food.name}</h3>
           <p className="mt-1 text-xs text-muted">
             {food.brand ? food.brand + ' · ' : ''}
             {food.source || 'Biblioteca'} · {n0(food.kcal)} kcal/100 {unit}
@@ -333,7 +337,7 @@ export function PortionStep({ food, initial, add, cta = 'Añadir' }: { food: Foo
         ))}
       </div>
 
-      <div className="mt-6 grid grid-cols-4 gap-2 rounded-3xl bg-surface-2 p-4 text-center">
+      <div className="mt-6 grid grid-cols-4 gap-2 rounded-[16px] bg-surface-2 p-4 text-center">
         <div>
           <div className="font-display text-2xl font-bold tnum">{n0(m.kcal)}</div>
           <div className="text-[11px] font-semibold text-muted">kcal</div>
@@ -360,7 +364,7 @@ export function PortionStep({ food, initial, add, cta = 'Añadir' }: { food: Foo
         className="mt-5 w-full"
         disabled={!(grams > 0)}
         onClick={() =>
-          add({ name: food.name, grams, kcal: +food.kcal || 0, c: +food.c || 0, p: +food.p || 0, f: +food.f || 0, brand: food.brand || '', source: food.source || '', portion: food.portion, portionLabel: food.portionLabel || '' })
+          add({ name: food.name, grams, kcal: +food.kcal || 0, c: +food.c || 0, p: +food.p || 0, f: +food.f || 0, brand: food.brand || '', source: food.source || '', portion: food.portion, portionLabel: food.portionLabel || '', ...(food.nutriscore ? { nutriscore: food.nutriscore } : {}) })
         }
       >
         {cta}

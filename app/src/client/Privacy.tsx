@@ -31,35 +31,35 @@ export function PrivacyText() {
         cuestión sobre ellos, escribe a tu coach por el canal habitual (WhatsApp).
       </p>
       <section>
-        <h3 className="font-display text-base font-bold">Qué datos guardamos</h3>
+        <h3 className="caps text-base">Qué datos guardamos</h3>
         <p className="mt-1 text-muted">
           Tu correo y tu contraseña (cifrada), lo que anotas en el diario (comidas, agua, actividad y notas), tu peso, las fotos de progreso, el cuestionario inicial y, solo si tú las
           rellenas, tus respuestas de salud.
         </p>
       </section>
       <section>
-        <h3 className="font-display text-base font-bold">Para qué y con qué base</h3>
+        <h3 className="caps text-base">Para qué y con qué base</h3>
         <p className="mt-1 text-muted">
           Solo para que tu coach haga el seguimiento de tu plan. Algunos de estos datos son datos de salud: los tratamos porque tú das tu consentimiento explícito al crear la cuenta y
           puedes retirarlo cuando quieras.
         </p>
       </section>
       <section>
-        <h3 className="font-display text-base font-bold">Quién los ve</h3>
+        <h3 className="caps text-base">Quién los ve</h3>
         <p className="mt-1 text-muted">
           Tú y tu coach. El peso, las fotos y las respuestas de salud solo los ve tu coach si marcas «Compartir». Se guardan en servidores de Supabase en la Unión Europea (Irlanda). El
           buscador de alimentos consulta Open Food Facts enviando únicamente el texto o el código de barras que buscas, nunca tus datos.
         </p>
       </section>
       <section>
-        <h3 className="font-display text-base font-bold">Cookies y almacenamiento</h3>
+        <h3 className="caps text-base">Cookies y almacenamiento</h3>
         <p className="mt-1 text-muted">
           No usamos cookies publicitarias ni analítica. El dispositivo solo guarda lo imprescindible para que la app funcione: tu sesión, el tema claro u oscuro y tus alimentos
           recientes y favoritos.
         </p>
       </section>
       <section>
-        <h3 className="font-display text-base font-bold">Tus derechos</h3>
+        <h3 className="caps text-base">Tus derechos</h3>
         <p className="mt-1 text-muted">
           Puedes acceder a tus datos, corregirlos, llevártelos (botón «Descargar mis datos»), pedir que se borren u oponerte a su uso escribiendo a tu coach. Si no quedas conforme,
           puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es). Los conservamos mientras uses el servicio.

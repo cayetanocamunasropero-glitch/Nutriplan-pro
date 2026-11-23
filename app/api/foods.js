@@ -1,6 +1,6 @@
 // ATLAS NUTRI: product info proxy. No credentials and no user food diary ever sent to Open Food Facts.
 const AGENT='AtlasNutri/2.0 (https://atlas-nutri.vercel.app; product lookup)';
-const fields='code,product_name_es,product_name,brands,stores,nutriments,serving_size,quantity,nutrition_data_per';
+const fields='code,product_name_es,product_name,brands,stores,nutriments,serving_size,quantity,nutrition_data_per,nutriscore_grade';
 module.exports=async function handler(req,res){
  res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control','public, s-maxage=300, stale-while-revalidate=900');
  if(req.method!=='GET')return res.status(405).json({error:'Solo consultas GET'});

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { AnimatePresence, motion } from 'motion/react';
-import { BookOpen, House, TrendingUp, UserRound } from 'lucide-react';
 import { claimInvite, getMyPlan, getOnboarding, type Onboarding as OB } from '../lib/data';
 import { errText } from '../lib/supabase';
 import type { PublishedPlan } from '../lib/types';
@@ -100,22 +99,21 @@ export function ClientApp({ session }: { session: Session }) {
 }
 
 function TabBar({ tab, setTab, hasPlan }: { tab: Tab; setTab: (t: Tab) => void; hasPlan: boolean }) {
-  const items: { id: Tab; label: string; icon: typeof House }[] = [
-    { id: 'today', label: 'Hoy', icon: House },
-    ...(hasPlan ? [{ id: 'plan' as Tab, label: 'Mi plan', icon: BookOpen }] : []),
-    { id: 'progress', label: 'Progreso', icon: TrendingUp },
-    { id: 'me', label: 'Yo', icon: UserRound },
+  const items: { id: Tab; label: string }[] = [
+    { id: 'today', label: 'Hoy' },
+    ...(hasPlan ? [{ id: 'plan' as Tab, label: 'Mi plan' }] : []),
+    { id: 'progress', label: 'Progreso' },
+    { id: 'me', label: 'Yo' },
   ];
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 safe-b">
-      <div className="mx-auto mb-2 flex max-w-sm items-center justify-around rounded-[26px] border border-line bg-surface/85 px-2 py-1.5 shadow-pop backdrop-blur-xl">
-        {items.map(({ id, label, icon: I }) => {
+    <nav className="fixed inset-x-0 bottom-0 z-40 px-3 safe-b" aria-label="Secciones">
+      <div className="mx-auto mb-2 flex max-w-md items-center gap-1 rounded-full bg-board p-1.5 shadow-pop">
+        {items.map(({ id, label }) => {
           const on = tab === id;
           return (
-            <button key={id} onClick={() => setTab(id)} className="relative flex flex-1 flex-col items-center gap-0.5 py-1.5" aria-current={on ? 'page' : undefined}>
-              {on && <motion.span layoutId="tabpill" className="absolute inset-x-2 inset-y-0 rounded-2xl bg-brand-soft" transition={{ type: 'spring', damping: 30, stiffness: 400 }} />}
-              <I className={`relative size-[22px] transition ${on ? 'text-brand' : 'text-faint'}`} strokeWidth={on ? 2.4 : 2} />
-              <span className={`relative text-[11px] font-semibold ${on ? 'text-brand' : 'text-faint'}`}>{label}</span>
+            <button key={id} onClick={() => setTab(id)} className="relative flex-1 rounded-full py-2.5" aria-current={on ? 'page' : undefined}>
+              {on && <motion.span layoutId="tabpill" className="absolute inset-0 rounded-full bg-chalk" transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }} />}
+              <span className={`caps relative text-[15px] transition-colors ${on ? 'text-board' : 'text-chalk-dim'}`}>{label}</span>
             </button>
           );
         })}

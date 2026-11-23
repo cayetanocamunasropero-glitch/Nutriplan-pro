@@ -9,6 +9,7 @@ import { DayBars, WeightLine } from '../ui/Charts';
 import { Button, Card, Label, SectionTitle, Toggle } from '../ui/kit';
 import { Sheet } from '../ui/Sheet';
 import { useToast } from '../ui/Toast';
+import { BoardHeader } from '../ui/Board';
 
 export function Progress({ plan, uid, onError }: { plan: PublishedPlan; uid: string; onError: (m: string) => void }) {
   const toast = useToast();
@@ -50,14 +51,14 @@ export function Progress({ plan, uid, onError }: { plan: PublishedPlan; uid: str
   const delta = current && first ? +current.weight_kg - +first.weight_kg : 0;
 
   return (
-    <div className="px-4 pt-6">
-      <h1 className="px-1 font-display text-[30px] font-extrabold leading-tight tracking-tight">Progreso</h1>
-
-      <div className="mt-4 grid grid-cols-3 gap-2.5">
+    <div className="px-4">
+      <BoardHeader title="Progreso" subtitle="Tu constancia, tus calorías y tu peso">
+        <div className="mt-4 grid grid-cols-3 gap-2">
         <Stat value={String(last7.length) + '/7'} label="días registrados" />
         <Stat value={avg ? n0(avg) : '—'} label="kcal media 7 d" />
         <Stat value={water7 ? (water7 / 1000).toLocaleString('es-ES', { maximumFractionDigits: 1 }) + ' L' : '—'} label="agua media" />
-      </div>
+        </div>
+      </BoardHeader>
 
       <SectionTitle>Calorías · 14 días</SectionTitle>
       <Card>
@@ -132,7 +133,7 @@ export function Progress({ plan, uid, onError }: { plan: PublishedPlan; uid: str
           </>
         ) : (
           <button onClick={() => setKgOpen(true)} className="flex w-full items-center gap-4 text-left">
-            <span className="grid size-12 place-items-center rounded-2xl bg-brand-soft text-brand">
+            <span className="grid size-12 place-items-center rounded-[12px] bg-brand-soft text-brand">
               <Scale className="size-6" />
             </span>
             <span>
@@ -169,7 +170,7 @@ export function Progress({ plan, uid, onError }: { plan: PublishedPlan; uid: str
       ) : (
         <Card>
           <button onClick={() => setPicOpen(true)} className="flex w-full items-center gap-4 text-left">
-            <span className="grid size-12 place-items-center rounded-2xl bg-brand-soft text-brand">
+            <span className="grid size-12 place-items-center rounded-[12px] bg-brand-soft text-brand">
               <ImagePlus className="size-6" />
             </span>
             <span>
@@ -198,9 +199,9 @@ export function Progress({ plan, uid, onError }: { plan: PublishedPlan; uid: str
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="rounded-[22px] bg-surface p-3.5 shadow-card">
-      <div className="font-display text-[22px] font-extrabold leading-none tracking-tight tnum">{value}</div>
-      <div className="mt-1.5 text-[11px] font-semibold leading-tight text-muted">{label}</div>
+    <div className="rounded-[12px] bg-board-2 p-3">
+      <div className="font-display text-[28px] font-extrabold leading-none tnum">{value}</div>
+      <div className="mt-1 text-[12px] font-semibold leading-tight text-chalk-dim">{label}</div>
     </div>
   );
 }
@@ -213,12 +214,12 @@ function Photo({ p, onDelete }: { p: ProgressPhoto; onDelete?: () => void }) {
   }, [p.storage_path]);
   return (
     <>
-      <button onClick={() => setBig(true)} className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-surface-2">
+      <button onClick={() => setBig(true)} className="relative aspect-[3/4] overflow-hidden rounded-[12px] bg-surface-2">
         {url && <img src={url} alt={'Foto del ' + p.recorded_on} className="size-full object-cover" loading="lazy" />}
         <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 text-left text-[11px] font-bold text-white">{short(p.recorded_on)}</span>
       </button>
       <Sheet open={big} onClose={() => setBig(false)} title={short(p.recorded_on)}>
-        {url && <img src={url} alt="" className="w-full rounded-2xl" />}
+        {url && <img src={url} alt="" className="w-full rounded-[12px]" />}
         {p.note && <p className="mt-3 text-sm">{p.note}</p>}
         <p className="mt-2 text-xs text-muted">{p.shared_with_coach ? 'Compartida con tu coach' : 'Privada'}</p>
         {onDelete && (
@@ -300,7 +301,7 @@ function PhotoSheet({ open, onClose, save }: { open: boolean; onClose: () => voi
   }, [open]);
   return (
     <Sheet open={open} onClose={onClose} title="Nueva foto">
-      <label className="relative grid aspect-[4/3] cursor-pointer place-items-center overflow-hidden rounded-3xl border-2 border-dashed border-line bg-surface-2">
+      <label className="relative grid aspect-[4/3] cursor-pointer place-items-center overflow-hidden rounded-[16px] border-2 border-dashed border-line bg-surface-2">
         {preview ? <img src={preview} alt="" className="absolute inset-0 size-full object-cover" /> : <span className="flex flex-col items-center gap-2 text-sm font-semibold text-muted"><Camera className="size-7" />Hacer o elegir foto</span>}
         <input
           type="file"

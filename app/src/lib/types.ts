@@ -141,4 +141,6 @@ export type Food = {
   portion?: number;
   portionLabel?: string;
   source?: string;
+  /** Nutri-Score del producto (a–e), solo si lo da Open Food Facts */
+  nutriscore?: string;
 };

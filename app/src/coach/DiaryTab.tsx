@@ -112,7 +112,7 @@ export function DiaryTab({ row, focus }: { row: Row; focus: string | null }) {
                   </p>
                 ) : null}
                 {l.day_notes && (
-                  <p className="mt-2 flex gap-2 rounded-2xl bg-surface-2 p-3 text-sm">
+                  <p className="mt-2 flex gap-2 rounded-[12px] bg-surface-2 p-3 text-sm">
                     <MessageSquareText className="mt-0.5 size-4 shrink-0 text-brand" />
                     <span className="whitespace-pre-line">{l.day_notes}</span>
                   </p>

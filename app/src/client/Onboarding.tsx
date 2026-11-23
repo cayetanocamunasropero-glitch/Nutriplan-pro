@@ -61,7 +61,7 @@ export function Onboarding({ uid, initial, editing, onDone }: { uid: string; ini
 
       <AnimatePresence mode="wait">
         <motion.div key={step} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.2 }} className="flex-1">
-          <h1 className="mt-8 font-display text-[32px] font-extrabold leading-tight tracking-tight">{S.title}</h1>
+          <h1 className="caps mt-8 text-[32px] leading-tight">{S.title}</h1>
           <p className="mt-2 text-[15px] text-muted">{step === 0 && !editing ? 'Bienvenido/a. Antes de empezar, cuéntale a tu coach lo básico de tu rutina. Podrás editarlo cuando quieras.' : S.desc}</p>
           <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-4">
             {S.fields.map((fl) => (
@@ -86,7 +86,7 @@ export function Onboarding({ uid, initial, editing, onDone }: { uid: string; ini
             ))}
           </div>
           {S.health && (
-            <div className="mt-6 space-y-2 rounded-3xl bg-surface p-4 shadow-card">
+            <div className="mt-6 space-y-2 rounded-[16px] bg-surface p-4">
               <div className="mb-1 flex items-center gap-2 text-sm font-bold">
                 <ShieldCheck className="size-4.5 text-brand" /> Privacidad
               </div>

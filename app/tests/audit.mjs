@@ -33,7 +33,7 @@ async function run(uid, size, label, steps) {
 }
 const M = { width: 390, height: 844 }, D = { width: 1366, height: 900 };
 await run(CLIENT_UID, M, 'cliente', [
-  ['hoy', (p) => p.getByText('kcal restantes').waitFor()],
+  ['hoy', (p) => p.getByText('Te quedan').first().waitFor()],
   ['buscar', async (p) => { await p.getByRole('button', { name: 'Añadir a Comida' }).click(); await p.getByPlaceholder('Busca: pollo, avena, yogur…').fill('arroz'); }],
   ['cantidad', (p) => p.getByRole('button', { name: /Arroz blanco cocido/ }).first().click()],
   ['plan', async (p) => { await p.keyboard.press('Escape'); await p.waitForTimeout(400); await p.getByRole('button', { name: 'Mi plan', exact: true }).click(); }],

@@ -39,11 +39,11 @@ export function Claim({ error, onDone }: { error?: string; onDone: () => void })
   return (
     <div className="mx-auto flex min-h-dvh max-w-md flex-col px-6 pb-8 pt-12">
       <Logo size={48} />
-      <h1 className="mt-8 font-display text-4xl font-extrabold leading-tight tracking-tight">Activa tu acceso</h1>
+      <h1 className="caps mt-8 text-4xl leading-tight">Activa tu acceso</h1>
       <p className="mt-3 text-[15px] leading-relaxed text-muted">
         Tu coach te ha enviado por WhatsApp un código personal con el formato <b className="text-ink">NP-XXXX-XXXX-…</b>. Escríbelo aquí para conectar tu cuenta.
       </p>
-      <div className="mt-8 rounded-[28px] bg-surface p-5 shadow-card">
+      <div className="mt-8 rounded-[16px] bg-surface p-5">
         <div className="relative">
           <KeyRound className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-faint" />
           <input
@@ -62,7 +62,7 @@ export function Claim({ error, onDone }: { error?: string; onDone: () => void })
           Activar
         </Button>
       </div>
-      <div className="mt-6 flex items-start gap-3 rounded-2xl bg-brand-soft p-4 text-sm text-brand">
+      <div className="mt-6 flex items-start gap-3 rounded-[12px] bg-brand-soft p-4 text-sm text-brand">
         <MessageCircle className="mt-0.5 size-5 shrink-0" />
         <p>El código solo sirve una vez y caduca a los 7 días. Si no te funciona, pide a tu coach que genere uno nuevo.</p>
       </div>

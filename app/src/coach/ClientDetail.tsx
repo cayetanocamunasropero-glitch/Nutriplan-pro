@@ -34,7 +34,7 @@ export function ClientDetail({ row, back, saveClient, reload, toast }: { row: Ro
           <ArrowLeft className="size-5" />
         </IconButton>
         <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-[28px] font-extrabold leading-tight tracking-tight">{row.c.name}</h1>
+          <h1 className="caps truncate text-[34px] leading-none">{row.c.name}</h1>
           <p className="text-sm text-muted">
             {row.status === 'linked' ? 'Usa la app' : row.status === 'pending' ? 'Invitación pendiente de activar' : 'Todavía sin acceso a la app'}
             {row.pub?.content?.title ? ' · ' + row.pub.content.title : ''}
@@ -190,7 +190,7 @@ function Summary({ row, pick }: { row: Row; pick: (d: string) => void }) {
 
 function Stat({ value, label, tone }: { value: string; label: string; tone?: 'ok' | 'warn' }) {
   return (
-    <div className="rounded-[22px] bg-surface p-4 shadow-card">
+    <div className="rounded-[12px] border-2 border-rule bg-surface p-4">
       <div className={`font-display text-[26px] font-extrabold leading-none tracking-tight tnum ${tone === 'ok' ? 'text-brand' : tone === 'warn' ? 'text-carb-ink' : ''}`}>{value}</div>
       <div className="mt-1.5 text-xs font-semibold leading-tight text-muted">{label}</div>
     </div>
