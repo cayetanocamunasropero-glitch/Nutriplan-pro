@@ -597,7 +597,60 @@ export function parseExtras(pages: Line[][], groups: PlanGroup[]) {
       if (long) it.name = long;
     }
   if (nVar) report.push(`${nVar} variantes con su alimento`);
+
+  // 5) Queso a elegir con su carne (pizzas): «Queso: mozzarella light 40 g (pollo en tiras 80 g) o QuesPro 125 g SIN tiras; …»
+  let nCheese = 0;
+  for (const o of options) if (!o.kit && cheeseKit(o, groups)) nCheese++;
+  if (nCheese) report.push(`${nCheese} ${nCheese === 1 ? 'opción' : 'opciones'} con queso a elegir`);
   return { coachNotes: notes.filter((n) => n.lines.length), report };
+}
+
+const CHEESE = /(mozzarella(?:\s+(?:light|bolsa|fresca))?|quespro|burrata(?:\s+fresca)?|(?:queso\s+(?:de\s+)?)?untar\s+light)\s+(\d+)\s*g\b/gi;
+const MEAT = /(tiras|pechuga|pollo|ternera|vacuno|at[úu]n|pavo|jam[óo]n)/i;
+
+/** Crea la casilla «Queso» de una opción a partir de sus variantes, cada queso con su cantidad de carne. */
+function cheeseKit(o: Kitted, groups: PlanGroup[]) {
+  const txt = (o.notes || '').replace(/^\s*variantes?\s*:\s*/i, '');
+  const cheeseItem = o.items.find((it) => /(mozzarella|quespro|burrata|untar)/i.test(it.name));
+  if (!txt || !cheeseItem) return false;
+  const meatItem = o.items.find((it) => it !== cheeseItem && MEAT.test(it.name));
+  const mentions = [...txt.matchAll(CHEESE)].map((m) => ({ label: m[1].replace(/\s+/g, ' '), grams: +m[2], at: m.index!, end: m.index! + m[0].length }));
+  if (mentions.length < 2) return false;
+  // Carne de cada queso: lo que sigue a la mención («(tiras 80 g)», «SIN tiras», «-> solo 80 g»); si no dice nada, la del resto de su lista
+  const meat = mentions.map((m, i) => {
+    const next = mentions[i + 1]?.at ?? txt.length;
+    const after = txt.slice(m.end, next);
+    if (/sin\s+(tiras|pollo|carne|pechuga)/i.test(after)) return 0;
+    const solo = after.match(/->\s*solo\s+(\d+)\s*g/i) || after.match(/\+\s*(?:pollo|pechuga|tiras|ternera)[^\d]*(\d+)\s*g/i) || after.match(/\((?:[^)]*?)(\d+)\s*g\)/);
+    return solo ? +solo[1] : null;
+  });
+  for (let i = meat.length - 2; i >= 0; i--) {
+    const sameClause = !/[;.]/.test(txt.slice(mentions[i].end, mentions[i + 1].at).replace(/\d\.\d/g, ''));
+    if (meat[i] == null && sameClause) meat[i] = meat[i + 1];
+  }
+  const base = o.items.filter((it) => it !== cheeseItem && it !== meatItem);
+  const at = o.items.indexOf(cheeseItem);
+  const seen = new Set<string>();
+  const choices: KitChoice[] = [];
+  mentions.forEach((m, i) => {
+    let name = cap1(m.label);
+    if (/^untar/i.test(name)) name = 'Queso ' + name.toLowerCase();
+    const known = labelScore(m.label, cheeseItem.name) >= 0.99 ? cheeseItem : findItem(m.label, groups, o);
+    const key = norm(known ? known.name : name) + '|' + m.grams;
+    if (seen.has(key)) return;
+    seen.add(key);
+    const g = meat[i] ?? meatItem?.grams ?? 0;
+    const items = [known ? copyOf(known, m.grams) : blank(name, m.grams), ...(meatItem && g > 0 ? [copyOf(meatItem, g)] : [])];
+    const id = norm(name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    choices.push({ id: choices.some((c) => c.id === id) ? id + '-' + m.grams : id, label: `${name} ${m.grams} g${meatItem && g === 0 ? ' (sin ' + (/tiras/i.test(meatItem.name) ? 'tiras' : 'carne') + ')' : ''}`, items });
+  });
+  // La elección por defecto es la de la opción tal cual está en el PDF
+  const def = choices.findIndex((c) => c.items![0].name === cheeseItem.name && c.items![0].grams === cheeseItem.grams);
+  if (def < 0) choices.unshift({ id: 'plan', label: `${cheeseItem.name} ${cheeseItem.grams} g`, items: [cheeseItem, ...(meatItem ? [meatItem] : [])] });
+  else if (def > 0) choices.unshift(...choices.splice(def, 1));
+  if (choices.length < 2) return false;
+  o.kit = { base, slots: [{ id: 'queso', label: 'Queso', at: Math.min(at, base.length), choices }] };
+  return true;
 }
 
 function uniqueByBrand(label: string, groups: PlanGroup[]) {

@@ -263,6 +263,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                                       {' · '}
                                       {n1(it.grams)} {unitOf(it.name)}
                                       {!e.freeEntry && e.letter ? ` · opción ${e.letter}` : ''}
+                                      {!e.freeEntry && typeof e.combo === 'string' && e.combo && ix === 0 ? ` (${e.combo})` : ''}
                                     </span>
                                   </span>
                                   <span className="leader" aria-hidden />

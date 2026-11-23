@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, CheckCircle2, FileUp, Pencil, Send, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, FileUp, Pencil, Plus, Send, X } from 'lucide-react';
 import { getDraft, publishPlan } from '../lib/data';
 import { errText } from '../lib/supabase';
 import { itemsMacros, n0, planTarget } from '../lib/nutrition';
@@ -210,7 +210,10 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
             share: g.share,
             options: g.options.map((o) => normalizeOption({ letter: o.letter, title: o.title, notes: o.notes, ...(o.kit ? { kit: o.kit } : {}), items: o.items.map((i) => ({ ...i, name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f })) })),
           })),
-        ...(draft.coachNotes?.length ? { coachNotes: draft.coachNotes } : {}),
+        ...(() => {
+          const notes = (draft.coachNotes || []).map((n) => ({ title: n.title.trim(), lines: n.lines.map((l) => l.trim()).filter(Boolean) })).filter((n) => n.title && n.lines.length);
+          return notes.length ? { coachNotes: notes } : {};
+        })(),
         target: draft.target,
         status: 'draft',
         planType: 'alternative-tracker-v1',
@@ -354,23 +357,42 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
           </div>
         </div>
       ))}
+      <SectionTitle
+        action={
+          <Button size="sm" variant="soft" icon={<Plus className="size-4" />} onClick={() => setDraft({ ...draft, coachNotes: [...(draft.coachNotes || []), { title: 'Nota', lines: [''] }] })}>
+            Añadir nota
+          </Button>
+        }
+      >
+        Notas para el cliente
+      </SectionTitle>
       {draft.coachNotes?.length ? (
-        <>
-          <SectionTitle>Notas para el cliente</SectionTitle>
-          <Card className="!p-4">
-            {draft.coachNotes.map((n) => (
-              <div key={n.title} className="mb-3 last:mb-0">
-                <b className="text-sm">{n.title}</b>
-                <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-muted">
-                  {n.lines.map((l, i) => (
-                    <li key={i}>{l}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </Card>
-        </>
-      ) : null}
+        <div className="space-y-2.5">
+          <p className="px-1 text-xs text-muted">Una línea por punto. El cliente lo ve en «Mi plan» → «Notas de tu coach».</p>
+          {draft.coachNotes.map((n, ni) => {
+            const set = (patch: Partial<CoachNote> | null) =>
+              setDraft({ ...draft, coachNotes: patch === null ? draft.coachNotes!.filter((_, k) => k !== ni) : draft.coachNotes!.map((x, k) => (k === ni ? { ...x, ...patch } : x)) });
+            return (
+              <Card key={ni} className="!p-4">
+                <div className="flex items-center gap-2">
+                  <input className="field flex-1 font-semibold" value={n.title} onChange={(e) => set({ title: e.target.value })} aria-label="Título de la nota" />
+                  <button onClick={() => set(null)} className="grid size-9 shrink-0 place-items-center rounded-full text-faint hover:text-danger" aria-label={'Quitar la nota ' + n.title}>
+                    <X className="size-4" />
+                  </button>
+                </div>
+                <textarea
+                  className="field mt-2 min-h-28 py-2 text-sm leading-relaxed"
+                  value={n.lines.join('\n')}
+                  onChange={(e) => set({ lines: e.target.value.split('\n') })}
+                  aria-label={'Texto de la nota ' + n.title}
+                />
+              </Card>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="px-1 text-sm text-muted">Sin notas. Añade reglas, consejos o el día de ejemplo y el cliente los verá en «Mi plan».</p>
+      )}
       <p className="mt-4 px-1 text-xs text-muted">kcal, HC, P y G son valores por 100 g del alimento. «↳» = intercambio que el cliente puede elegir.</p>
       <div className="sticky bottom-0 -mx-4 mt-4 bg-gradient-to-t from-bg via-bg to-transparent px-4 pb-4 pt-6 safe-b">
         <Button size="lg" className="w-full" loading={busy} onClick={publish} icon={<Send className="size-4.5" />}>
