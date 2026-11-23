@@ -54,18 +54,39 @@ export type PlanOptionItem = {
   p: number;
   f: number;
   unit?: string;
+  /** Nota de ración: «1 vaso (~250 ml)», «pesar antes de cocer»… (la clásica también la muestra) */
+  portion?: string;
+  /** Intercambios con sus macros (el cliente puede cambiar el alimento) */
   choices?: PlanOptionItem[];
   alternatives?: PlanOptionItem[];
+  /** Intercambios en texto, para la versión clásica */
+  alternativesText?: string;
   [k: string]: unknown;
 };
+
+/** Una elección dentro de una combinación (p. ej. «Pechuga», «QuesPro 75 g», «BBQ 30 g»). */
+export type KitChoice = {
+  id: string;
+  label: string;
+  items?: PlanOptionItem[];
+  /** Alimentos según lo elegido en otra casilla (p. ej. la carne cambia con el queso) */
+  by?: Record<string, PlanOptionItem[]>;
+};
+export type KitSlot = { id: string; label: string; dependsOn?: string; /** posición de sus alimentos dentro de la base */ at?: number; choices: KitChoice[] };
+/** Opción que se arma eligiendo (wraps: relleno × queso × salsa; pizza: queso). `items` guarda la elección por defecto. */
+export type PlanKit = { base: PlanOptionItem[]; slots: KitSlot[] };
 
 export type PlanOption = {
   letter: string;
   title?: string;
   notes?: string;
   items: PlanOptionItem[];
+  kit?: PlanKit;
   [k: string]: unknown;
 };
+
+/** Apuntes del plan para el cliente: reglas, guía, día de ejemplo, intercambios… */
+export type CoachNote = { title: string; lines: string[] };
 
 export type PlanGroup = {
   name: string;
@@ -85,6 +106,7 @@ export type PlanContent = {
   meals?: { name: string; share?: number; items: { name: string; grams: number; c: number; p: number; f: number; kcal: number }[]; total?: Macros }[];
   totals?: Macros;
   diaryOnly?: boolean;
+  coachNotes?: CoachNote[];
   title?: string;
   status?: string;
   planType?: string;

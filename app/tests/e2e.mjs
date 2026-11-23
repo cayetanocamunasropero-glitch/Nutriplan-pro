@@ -122,12 +122,32 @@ async function login(p, email) {
   await p.getByRole('heading', { name: 'Mi plan' }).waitFor();
   await p.waitForTimeout(500);
   await p.screenshot({ path: `${OUT}/06-plan.png`, fullPage: true });
-  await p.getByRole('tab', { name: 'B', exact: true }).click();
+  await p.getByRole('tab', { name: 'B', exact: true }).first().click();
   await p.getByRole('button', { name: 'Registrar' }).first().click();
   await p.waitForTimeout(800);
   log = L();
   const planEntry = log.entries.find((e) => e.meal === 'Desayuno' && !e.freeEntry);
   ok(planEntry && planEntry.letter === 'B' && planEntry.items.length === 2, 'opción B del desayuno registrada con formato del plan');
+  // Intercambio de alimento (arroz → pasta) y total del día
+  ok(await p.getByText('Tu día con estas opciones').isVisible(), 'total del día con las opciones elegidas');
+  ok(await p.getByRole('heading', { name: 'Notas de tu coach' }).isVisible(), 'notas del coach en «Mi plan»');
+  const before = await p.locator('#day-total').locator('..').textContent();
+  await p.getByRole('button', { name: /Cambiar Arroz blanco crudo/ }).click();
+  await p.getByRole('radio', { name: /Pasta seca cruda/ }).click();
+  await p.waitForTimeout(500);
+  ok(await p.getByText('en lugar de arroz blanco crudo').isVisible(), 'intercambio de alimento aplicado');
+  ok((await p.locator('#day-total').locator('..').textContent()) !== before, 'el total del día se recalcula al cambiar un alimento');
+  // Opción que se arma eligiendo (wraps)
+  await p.getByRole('tab', { name: 'B', exact: true }).nth(1).click();
+  await p.getByRole('radio', { name: 'Atún' }).click();
+  await p.getByRole('radio', { name: 'Yogur 50 g' }).click();
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: `${OUT}/06b-plan-combinacion.png`, fullPage: true });
+  await p.getByRole('button', { name: 'Registrar' }).first().click();
+  await p.waitForTimeout(800);
+  log = L();
+  const kitEntry = log.entries.find((e) => e.meal === 'Comida' && !e.freeEntry);
+  ok(kitEntry && kitEntry.letter === 'B' && kitEntry.combo === 'Atún · Yogur 50 g' && kitEntry.items.map((i) => i.name).join('|') === 'Tortilla de trigo|Atún al natural|Salsa de yogur', 'combinación elegida registrada con sus alimentos');
 
   // Progreso
   await p.getByRole('button', { name: 'Progreso', exact: true }).click();
@@ -286,6 +306,11 @@ for (const [w, h, tag] of [
       await p.waitForTimeout(800);
       const pub = db.nutriplan_published_plans.find((x) => x.client_id === 'c-pablo');
       ok(pub.content.groups.length >= 1 && pub.content.planType === 'alternative-tracker-v1' && db.nutriplan_diet_drafts.length === 1, 'dieta del PDF publicada (' + pub.content.groups.length + ' comidas)');
+      const kits = pub.content.groups.flatMap((g) => g.options).filter((o) => o.kit).length;
+      const swaps = pub.content.groups.flatMap((g) => g.options.flatMap((o) => o.items)).filter((i) => i.choices?.length > 1).length;
+      console.log(`   publicado: ${kits} opciones con combinaciones, ${swaps} alimentos intercambiables, ${pub.content.coachNotes?.length || 0} notas del coach`);
+      const badAlt = pub.content.groups.flatMap((g) => g.options.flatMap((o) => o.items.flatMap((i) => (i.choices || []).filter((c) => !Number.isFinite(c.kcal)).map((c) => `${g.name} ${o.letter}: ${i.name} → ${c.name}`))));
+      ok(!badAlt.length, 'intercambios publicados con sus macros' + (badAlt.length ? ' · ' + badAlt.slice(0, 3).join(' | ') : ''));
     }
   }
   await c.close();

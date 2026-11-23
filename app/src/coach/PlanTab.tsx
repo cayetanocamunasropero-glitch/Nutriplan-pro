@@ -3,15 +3,31 @@ import { AlertTriangle, CheckCircle2, FileUp, Pencil, Send, X } from 'lucide-rea
 import { getDraft, publishPlan } from '../lib/data';
 import { errText } from '../lib/supabase';
 import { itemsMacros, n0, planTarget } from '../lib/nutrition';
-import type { LogItem, Macros, PlanContent, PlanGroup } from '../lib/types';
+import type { CoachNote, LogItem, Macros, PlanContent, PlanGroup, PlanOption, PlanOptionItem } from '../lib/types';
+import { eachItem, kitCombos, kitItems, normalizeOption } from '../lib/plan';
 import { Button, Card, Empty, Label, SectionTitle } from '../ui/kit';
 import { planGroups } from '../client/PlanView';
 import type { Row } from './CoachApp';
 import type { Toast } from './ClientDetail';
 
-type Draft = { title: string; groups: PlanGroup[]; target: Macros; source: 'pdf' | 'edit'; report?: string };
+type Draft = { title: string; groups: PlanGroup[]; target: Macros; source: 'pdf' | 'edit'; report?: string; coachNotes?: CoachNote[] };
 
-const valid = (i: { kcal: unknown; c: unknown; p: unknown; f: unknown; grams: unknown }) => ['kcal', 'c', 'p', 'f', 'grams'].every((k) => Number.isFinite(Number((i as Record<string, unknown>)[k])) && Number((i as Record<string, unknown>)[k]) >= 0);
+/** Alimentos distintos de una combinación (wraps, pizzas), para revisar sus macros una sola vez. */
+function kitFoods(o: PlanOption) {
+  const seen = new Map<string, PlanOptionItem>();
+  if (o.kit) for (const s of o.kit.slots) for (const c of s.choices) for (const it of [...(c.items || []), ...Object.values(c.by || {}).flat()]) if (!seen.has(it.name)) seen.set(it.name, it);
+  return [...seen.values()];
+}
+
+// Un valor vacío (NaN, o null tras copiar el borrador) es «falta», no 0
+const isNum = (v: unknown) => v !== null && v !== undefined && v !== '' && Number.isFinite(Number(v)) && Number(v) >= 0;
+const valid = (i: { kcal: unknown; c: unknown; p: unknown; f: unknown; grams: unknown }) => ['kcal', 'c', 'p', 'f', 'grams'].every((k) => isNum((i as Record<string, unknown>)[k]));
+const toNum = (v: string) => (v.trim() === '' ? NaN : Number(v.replace(',', '.')));
+const countBad = (groups: PlanGroup[]) => {
+  let n = 0;
+  for (const g of groups) for (const o of g.options) eachItem(o, (it) => (n += valid(it) ? 0 : 1));
+  return n;
+};
 
 export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; toast: Toast }) {
   const [draft, setDraft] = useState<Draft | null>(null);
@@ -34,8 +50,13 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
         // El formato «menú con opciones» no trae macros por alimento: se completan con tus planes, la biblioteca y el catálogo.
         const pubs = await data.listPublished().catch(() => []);
         const refs = [...menu.refsFromPlans(pubs.map((p) => p.content || {})), ...foods.LIBRARY];
+        // 1) tus planes y la biblioteca, 2) lo que falte en los wraps sale de su tabla de totales, 3) catálogo, 4) quesos e intercambios
+        await menu.fillMacros(r.groups as never, refs);
+        const solved = menu.solveKits(r.groups as never);
         const st = await menu.fillMacros(r.groups as never, refs, (q) => foods.searchCatalog(q));
-        fillNote = ` Valores: ${st.fromPlans} de tus planes o la biblioteca, ${st.fromTotals} calculados con el total del PDF${st.fromCatalog ? `, ${st.fromCatalog} del catálogo (revísalos)` : ''}${st.missing ? `, ${st.missing} por completar` : ''}.`;
+        const fin = menu.finishExtras(r.groups as never, r.coachNotes);
+        const extra = [...(r.notes || []), ...solved, ...fin];
+        fillNote = ` Valores: ${st.fromTotals ? `${st.fromTotals} calculados con el total del PDF, ` : ''}${st.fromCatalog ? `${st.fromCatalog} del catálogo (revísalos), ` : ''}${st.missing ? `${st.missing} por completar` : 'completos'}.${extra.length ? ' ' + extra.join(' · ') + '.' : ''}`;
       }
       const t = r.target?.kcal ? r.target : target;
       setDraft({
@@ -48,9 +69,11 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
             title: o.title,
             notes: o.notes,
             ...(o.pdfKcal != null ? { pdfKcal: o.pdfKcal } : {}),
-            items: o.items.map((i) => ({ name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f, ...(i.unit ? { unit: i.unit } : {}), ...(i.portion ? { portion: i.portion } : {}) })),
+            ...(o.kit ? { kit: o.kit } : {}),
+            items: o.items.map((i) => ({ ...i, name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f })),
           })),
         })),
+        coachNotes: r.coachNotes?.length ? r.coachNotes : undefined,
         target: { kcal: +(t.kcal || 0), c: +(t.c || 0), p: +(t.p || 0), f: +(t.f || 0) },
         source: 'pdf',
         report: (r.report ? `${r.report.groups} comidas · ${r.report.options} opciones · ${r.report.ingredients} ingredientes.` : '') + fillNote,
@@ -67,7 +90,7 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
     try {
       const d = (await getDraft(row.c.id)) || content;
       const g = d && Array.isArray(d.groups) && d.groups.length ? d.groups : groups;
-      setDraft({ title: String(d?.title || 'Plan de ' + row.c.name), groups: JSON.parse(JSON.stringify(g)), target, source: 'edit' });
+      setDraft({ title: String(d?.title || 'Plan de ' + row.c.name), groups: JSON.parse(JSON.stringify(g)), target, source: 'edit', coachNotes: (d?.coachNotes || content?.coachNotes) as CoachNote[] | undefined });
     } catch (e) {
       setErr(errText(e));
     } finally {
@@ -139,16 +162,27 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
 
 function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft: (d: Draft | null) => void; row: Row; done: () => void; toast: Toast }) {
   const [busy, setBusy] = useState(false);
-  const bad = draft.groups.reduce((n, g) => n + g.options.reduce((a, o) => a + o.items.filter((i) => !valid(i)).length, 0), 0);
-  const upd = (gi: number, oi: number, ii: number, k: string, v: string) => {
+  const bad = countBad(draft.groups);
+  const upd = (gi: number, oi: number, ii: number, k: string, v: string, ci?: number) => {
     const g = JSON.parse(JSON.stringify(draft.groups)) as PlanGroup[];
-    const it = g[gi].options[oi].items[ii] as Record<string, unknown>;
-    it[k] = k === 'name' ? v : Number(v.replace(',', '.'));
+    const o = g[gi].options[oi];
+    const base = (o.kit ? o.kit.base : o.items)[ii];
+    const it = (ci == null ? base : base.choices![ci]) as Record<string, unknown>;
+    it[k] = k === 'name' ? v : toNum(v);
+    setDraft({ ...draft, groups: g });
+  };
+  // Un alimento de la combinación: se cambia en todas sus apariciones (los gramos de cada elección se respetan)
+  const updKit = (gi: number, oi: number, name: string, k: string, v: string) => {
+    const g = JSON.parse(JSON.stringify(draft.groups)) as PlanGroup[];
+    const o = g[gi].options[oi];
+    if (o.kit) for (const s of o.kit.slots) for (const c of s.choices) for (const it of [...(c.items || []), ...Object.values(c.by || {}).flat()]) if (it.name === name) (it as Record<string, unknown>)[k] = toNum(v);
+    if (o.kit) o.items = kitItems(o.kit, {});
     setDraft({ ...draft, groups: g });
   };
   const removeItem = (gi: number, oi: number, ii: number) => {
     const g = JSON.parse(JSON.stringify(draft.groups)) as PlanGroup[];
-    g[gi].options[oi].items.splice(ii, 1);
+    const o = g[gi].options[oi];
+    (o.kit ? o.kit.base : o.items).splice(ii, 1);
     setDraft({ ...draft, groups: g });
   };
   const T = (k: keyof Macros, label: string) => (
@@ -171,7 +205,12 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
         groups: draft.groups
           .map((g) => ({ ...g, options: g.options.filter((o) => o.items.length) }))
           .filter((g) => g.options.length)
-          .map((g) => ({ name: g.name, share: g.share, options: g.options.map((o) => ({ letter: o.letter, title: o.title, notes: o.notes, items: o.items.map((i) => ({ ...i, name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f })) })) })),
+          .map((g) => ({
+            name: g.name,
+            share: g.share,
+            options: g.options.map((o) => normalizeOption({ letter: o.letter, title: o.title, notes: o.notes, ...(o.kit ? { kit: o.kit } : {}), items: o.items.map((i) => ({ ...i, name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f })) })),
+          })),
+        ...(draft.coachNotes?.length ? { coachNotes: draft.coachNotes } : {}),
         target: draft.target,
         status: 'draft',
         planType: 'alternative-tracker-v1',
@@ -215,7 +254,7 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
           <SectionTitle>{g.name}</SectionTitle>
           <div className="space-y-2.5">
             {g.options.map((o, oi) => {
-              const m = itemsMacros(o.items as LogItem[]);
+              const m = itemsMacros((o.kit ? kitItems(o.kit, {}) : o.items) as LogItem[]);
               return (
                 <Card key={o.letter + oi} className="!p-4">
                   <div className="mb-2 flex items-baseline justify-between gap-2">
@@ -242,7 +281,7 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
                         </tr>
                       </thead>
                       <tbody>
-                        {o.items.map((it, ii) => (
+                        {(o.kit ? o.kit.base : o.items).flatMap((it, ii) => [
                           <tr key={ii} className={valid(it) ? '' : 'bg-carb/10'}>
                             <td className="px-1 py-0.5">
                               <input className="w-full rounded-lg bg-transparent px-1 py-1 outline-none focus:bg-surface-2" value={it.name} onChange={(e) => upd(gi, oi, ii, 'name', e.target.value)} />
@@ -250,9 +289,9 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
                             {(['grams', 'kcal', 'c', 'p', 'f'] as const).map((k) => (
                               <td key={k} className="px-1">
                                 <input
-                                  className={`w-full rounded-lg px-1 py-1 text-right outline-none tnum focus:bg-surface-2 ${Number.isFinite(+it[k]) ? 'bg-transparent' : 'bg-carb/20'}`}
+                                  className={`w-full rounded-lg px-1 py-1 text-right outline-none tnum focus:bg-surface-2 ${isNum(it[k]) ? 'bg-transparent' : 'bg-carb/20'}`}
                                   inputMode="decimal"
-                                  value={Number.isFinite(+it[k]) ? String(it[k]) : ''}
+                                  value={isNum(it[k]) ? String(it[k]) : ''}
                                   onChange={(e) => upd(gi, oi, ii, k, e.target.value)}
                                 />
                               </td>
@@ -262,11 +301,52 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
                                 <X className="size-3.5" />
                               </button>
                             </td>
-                          </tr>
-                        ))}
+                          </tr>,
+                          ...(it.choices || []).map((ch, ci) => (ch.name.trim().toLowerCase() === it.name.trim().toLowerCase() ? null : (
+                            <tr key={ii + '-' + ci} className={valid(ch) ? 'text-muted' : 'bg-carb/10 text-muted'}>
+                              <td className="px-1 py-0.5">
+                                <span className="flex items-center gap-1 pl-3">
+                                  <span aria-hidden>↳</span>
+                                  <input className="w-full rounded-lg bg-transparent px-1 py-1 outline-none focus:bg-surface-2" value={ch.name} onChange={(e) => upd(gi, oi, ii, 'name', e.target.value, ci)} aria-label={'Intercambio de ' + it.name} />
+                                </span>
+                              </td>
+                              {(['grams', 'kcal', 'c', 'p', 'f'] as const).map((k) => (
+                                <td key={k} className="px-1">
+                                  <input
+                                    className={`w-full rounded-lg px-1 py-1 text-right outline-none tnum focus:bg-surface-2 ${isNum(ch[k]) ? 'bg-transparent' : 'bg-carb/20'}`}
+                                    inputMode="decimal"
+                                    value={isNum(ch[k]) ? String(ch[k]) : ''}
+                                    onChange={(e) => upd(gi, oi, ii, k, e.target.value, ci)}
+                                  />
+                                </td>
+                              ))}
+                              <td />
+                            </tr>
+                          ))),
+                        ])}
+                        {o.kit &&
+                          kitFoods(o).map((it) => (
+                            <tr key={'k' + it.name} className={valid(it) ? '' : 'bg-carb/10'}>
+                              <td className="px-2 py-1.5">{it.name}</td>
+                              <td className="px-1 text-right text-muted tnum">varía</td>
+                              {(['kcal', 'c', 'p', 'f'] as const).map((k) => (
+                                <td key={k} className="px-1">
+                                  <input
+                                    className={`w-full rounded-lg px-1 py-1 text-right outline-none tnum focus:bg-surface-2 ${isNum(it[k]) ? 'bg-transparent' : 'bg-carb/20'}`}
+                                    inputMode="decimal"
+                                    value={isNum(it[k]) ? String(it[k]) : ''}
+                                    onChange={(e) => updKit(gi, oi, it.name, k, e.target.value)}
+                                    aria-label={`${k} de ${it.name}`}
+                                  />
+                                </td>
+                              ))}
+                              <td />
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
+                  {o.kit && <KitSummary o={o} />}
                   {o.notes && <p className="mt-2 text-xs text-muted">{o.notes}</p>}
                 </Card>
               );
@@ -274,12 +354,47 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
           </div>
         </div>
       ))}
-      <p className="mt-4 px-1 text-xs text-muted">kcal, HC, P y G son valores por 100 g del alimento.</p>
+      {draft.coachNotes?.length ? (
+        <>
+          <SectionTitle>Notas para el cliente</SectionTitle>
+          <Card className="!p-4">
+            {draft.coachNotes.map((n) => (
+              <div key={n.title} className="mb-3 last:mb-0">
+                <b className="text-sm">{n.title}</b>
+                <ul className="mt-1 list-disc space-y-0.5 pl-5 text-xs text-muted">
+                  {n.lines.map((l, i) => (
+                    <li key={i}>{l}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </Card>
+        </>
+      ) : null}
+      <p className="mt-4 px-1 text-xs text-muted">kcal, HC, P y G son valores por 100 g del alimento. «↳» = intercambio que el cliente puede elegir.</p>
       <div className="sticky bottom-0 -mx-4 mt-4 bg-gradient-to-t from-bg via-bg to-transparent px-4 pb-4 pt-6 safe-b">
         <Button size="lg" className="w-full" loading={busy} onClick={publish} icon={<Send className="size-4.5" />}>
           Publicar para {row.c.name.split(' ')[0]}
         </Button>
       </div>
+    </div>
+  );
+}
+
+function KitSummary({ o }: { o: PlanOption }) {
+  const k = o.kit!;
+  const kc = kitCombos(k).map((sel) => itemsMacros(kitItems(k, sel) as LogItem[]).kcal);
+  const ok = kc.filter((x) => Number.isFinite(x));
+  return (
+    <div className="mt-2 rounded-[10px] bg-surface-2 p-3 text-xs">
+      <b>Se arma eligiendo</b> · {kc.length} combinaciones{ok.length ? ` · ${n0(Math.min(...ok))}–${n0(Math.max(...ok))} kcal` : ''}
+      <ul className="mt-1 space-y-0.5 text-muted">
+        {k.slots.map((s) => (
+          <li key={s.id}>
+            <b className="text-ink">{s.label}:</b> {s.choices.map((c) => c.label).join(' · ')}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

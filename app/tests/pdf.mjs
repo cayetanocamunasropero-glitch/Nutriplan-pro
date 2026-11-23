@@ -22,6 +22,6 @@ for (const f of readdirSync(dir).filter((x) => x.endsWith('.pdf'))) {
   }
   const okk = r.length && opts && !missing;
   if (!okk) bad++;
-  console.log((okk ? '✓' : '✗'), useMenu ? '[menú]' : '[tabla]', f.slice(0, 56), JSON.stringify(r.readReport), 'target', JSON.stringify(r.pdfTarget), off ? `· ${off} opciones con kcal ≠ PDF` : '');
+  console.log((okk ? '✓' : '✗'), useMenu ? '[menú]' : '[tabla]', f.slice(0, 56), JSON.stringify(r.readReport), 'target', JSON.stringify(r.pdfTarget), off ? `· ${off} opciones con kcal ≠ PDF` : '', useMenu && menu.notes?.length ? '\n    · ' + menu.notes.join(' · ') + ` · ${menu.coachNotes.length} notas` : '');
 }
 process.exit(bad ? 1 : 0);

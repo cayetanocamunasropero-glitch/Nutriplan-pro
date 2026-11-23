@@ -1,4 +1,4 @@
-import type { PlanGroup, Macros } from '../types';
+import type { CoachNote, PlanGroup, Macros } from '../types';
 import { looksLikeMenu, parseMenuPdf } from './menu';
 
 /** Lee un PDF de dieta (tabla ALIMENTO · CANT. · KCAL · HC · P · G) y devuelve grupos con opciones. */
@@ -25,8 +25,8 @@ export async function parseDietPdf(file: File) {
   const tableOptions = table.reduce((n, g) => n + g.options.length, 0);
   if (looksLikeMenu(pages)) {
     const menu = parseMenuPdf(pages);
-    if (menu.report.options > tableOptions) return { groups: menu.groups as PlanGroup[], target: menu.target, report: menu.report, kind: 'menu' as const };
+    if (menu.report.options > tableOptions) return { groups: menu.groups as PlanGroup[], target: menu.target, report: menu.report, coachNotes: menu.coachNotes as CoachNote[], notes: menu.notes, kind: 'menu' as const };
   }
   if (!table.length) throw new Error('No se detectaron comidas en el PDF. Puede ser una imagen escaneada o tener otro formato.');
-  return { groups: table as PlanGroup[], target: (table.pdfTarget || null) as Partial<Macros> | null, report: table.readReport, kind: 'tabla' as const };
+  return { groups: table as PlanGroup[], target: (table.pdfTarget || null) as Partial<Macros> | null, report: table.readReport, coachNotes: [] as CoachNote[], notes: [] as string[], kind: 'tabla' as const };
 }
