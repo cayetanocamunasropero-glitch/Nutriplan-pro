@@ -148,6 +148,11 @@ async function login(p, email) {
   log = L();
   const kitEntry = log.entries.find((e) => e.meal === 'Comida' && !e.freeEntry);
   ok(kitEntry && kitEntry.letter === 'B' && kitEntry.combo === 'Atún · Yogur 50 g' && kitEntry.items.map((i) => i.name).join('|') === 'Tortilla de trigo|Atún al natural|Salsa de yogur', 'combinación elegida registrada con sus alimentos');
+  await p.getByRole('button', { name: 'Hoy', exact: true }).click();
+  await p.waitForTimeout(500);
+  ok(await p.getByText('(Atún · Yogur 50 g)').first().isVisible(), 'la combinación elegida se ve en «Hoy»');
+  await p.getByRole('button', { name: 'Mi plan', exact: true }).click();
+  await p.waitForTimeout(300);
 
   // Progreso
   await p.getByRole('button', { name: 'Progreso', exact: true }).click();
@@ -247,6 +252,23 @@ for (const [w, h, tag] of [
   await p.getByRole('button', { name: 'Plan', exact: true }).click();
   await p.waitForTimeout(300);
   await p.screenshot({ path: `${OUT}/23-coach-plan-${tag}.png`, fullPage: true });
+  if (tag === 'movil') {
+    // Editar el plan publicado: notas para el cliente editables, sin perder combinaciones ni intercambios
+    await p.getByRole('button', { name: 'Editar' }).click();
+    await p.getByText('Notas para el cliente').waitFor();
+    await p.getByRole('textbox', { name: 'Texto de la nota Reglas de productos' }).fill('Arroz siempre pesado en crudo.\n\nBebe 2 litros de agua.');
+    await p.getByRole('button', { name: 'Añadir nota' }).click();
+    await p.getByRole('textbox', { name: 'Texto de la nota Nota' }).fill('Entreno: come la opción B de comida.');
+    await p.screenshot({ path: `${OUT}/23b-coach-editor-${tag}.png`, fullPage: true });
+    p.once('dialog', (d) => d.accept());
+    await p.getByRole('button', { name: /Publicar para/ }).click();
+    await p.waitForTimeout(800);
+    const mp = db.nutriplan_published_plans.find((x) => x.client_id === 'c-mario').content;
+    const comida = mp.groups.find((g) => g.name === 'Comida');
+    ok(mp.coachNotes?.length === 2 && mp.coachNotes[0].lines.join('|') === 'Arroz siempre pesado en crudo.|Bebe 2 litros de agua.' && mp.coachNotes[1].lines[0].startsWith('Entreno'), 'notas para el cliente editadas por el coach');
+    ok(comida.options[1].kit?.slots.length === 2 && comida.options[0].items[0].choices[0].name === comida.options[0].items[0].name && comida.options[0].items[0].choices.length === 2, 'al reeditar se conservan combinaciones e intercambios (formato clásico)');
+    ok(db.nutriplan_published_plans.find((x) => x.client_id === 'c-mario').client_uid, 'al reeditar se conserva el vínculo con el cliente');
+  }
   await p.getByRole('button', { name: 'Ficha', exact: true }).click();
   await p.waitForTimeout(300);
   await p.screenshot({ path: `${OUT}/24-coach-ficha-${tag}.png`, fullPage: true });
@@ -305,7 +327,7 @@ for (const [w, h, tag] of [
       await p.getByRole('button', { name: /Publicar para/ }).click();
       await p.waitForTimeout(800);
       const pub = db.nutriplan_published_plans.find((x) => x.client_id === 'c-pablo');
-      ok(pub.content.groups.length >= 1 && pub.content.planType === 'alternative-tracker-v1' && db.nutriplan_diet_drafts.length === 1, 'dieta del PDF publicada (' + pub.content.groups.length + ' comidas)');
+      ok(pub.content.groups.length >= 1 && pub.content.planType === 'alternative-tracker-v1' && db.nutriplan_diet_drafts.some((x) => x.client_id === 'c-pablo'), 'dieta del PDF publicada (' + pub.content.groups.length + ' comidas)');
       const kits = pub.content.groups.flatMap((g) => g.options).filter((o) => o.kit).length;
       const swaps = pub.content.groups.flatMap((g) => g.options.flatMap((o) => o.items)).filter((i) => i.choices?.length > 1).length;
       console.log(`   publicado: ${kits} opciones con combinaciones, ${swaps} alimentos intercambiables, ${pub.content.coachNotes?.length || 0} notas del coach`);

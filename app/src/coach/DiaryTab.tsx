@@ -73,7 +73,7 @@ export function DiaryTab({ row, focus }: { row: Row; focus: string | null }) {
                       </div>
                       {list.map((e, k) => (
                         <div key={k}>
-                          {!e.freeEntry && e.letter && <div className="text-[11px] font-bold text-brand">Opción {e.letter} del plan{e.status === 'partial' ? ' · parcial' : ''}</div>}
+                          {!e.freeEntry && e.letter && <div className="text-[11px] font-bold text-brand">Opción {e.letter} del plan{typeof e.combo === 'string' && e.combo ? ` · ${e.combo}` : ''}{e.status === 'partial' ? ' · parcial' : ''}</div>}
                           {(e.items || []).map((it, j) => (
                             <div key={j} className="flex justify-between gap-3 py-0.5 text-sm">
                               <span className="min-w-0 truncate">
