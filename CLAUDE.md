@@ -41,6 +41,7 @@ Vercel team `team_CNO0OyROIW0IYun3Vrwgzak8`, proyecto `prj_8XKbo9Zs5S2h3IhsNrzC3
 - Firma: resumen del día como tabla nutricional (reglas 8/3/1 px), comidas y opciones con línea de puntos (`leader`), Nutri-Score real de Open Food Facts (`<NutriScore>`).
 - Texto secundario `muted`/`faint` (≥4,5:1); texto de color con `text-carb-ink`/`text-fat-ink`/`text-go`; `carb`/`prot`/`fat` solo para marcas. Tarjetas: `<Card>` (borde de tinta) o `tone="brand|ink"`, nunca `bg-*` por className.
 - Movimiento: `--ease-out`/`--ease-drawer`, solo `transform`/`opacity`, `MotionConfig reducedMotion="user"`; la hoja inferior se cierra arrastrando.
+- Acceso: fondo 3D de hojas y comida con Three.js (`ui/FoodScene.tsx`, todo procedural, carga diferida solo en el login). Sin WebGL → menú en tiza (`MenuBackdrop`); con «reducir movimiento» → fotograma fijo; se pausa con la pestaña oculta y baja resolución si el móvil va lento.
 - Resets de `input`/`select` en `@layer base` (si no, pisan las clases de tamaño).
 
 ## Skills del proyecto (`.claude/skills/`, ver su README)

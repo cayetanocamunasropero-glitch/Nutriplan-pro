@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { Suspense, lazy, useState, type FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Eye, EyeOff, Mail } from 'lucide-react';
 import { ORIGIN, errText, supabase } from './lib/supabase';
@@ -59,7 +59,7 @@ export function Login() {
 
   return (
     <div className="relative min-h-dvh overflow-hidden bg-board text-chalk">
-      <MenuBackdrop />
+      <Backdrop />
       <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-6 pb-8" style={{ paddingTop: 'max(48px, calc(env(safe-area-inset-top) + 32px))' }}>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3">
           <Logo size={44} />
@@ -73,7 +73,7 @@ export function Login() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
-          className="caps mt-12 text-[58px] leading-[0.9]"
+          className="caps mt-12 text-[58px] leading-[0.9] [text-shadow:0_2px_18px_rgb(23_35_29/0.85)]"
         >
           Tu menú.
           <br />
@@ -81,7 +81,7 @@ export function Login() {
           <br />
           <span className="text-accent">Tus resultados.</span>
         </motion.h1>
-        <p className="mt-6 flex max-w-sm items-baseline gap-2 whitespace-nowrap text-[16px] text-chalk-dim">
+        <p className="mt-6 flex max-w-sm items-baseline gap-2 whitespace-nowrap text-[16px] text-chalk-dim [text-shadow:0_1px_10px_rgb(23_35_29),0_0_3px_rgb(23_35_29)]">
           <span>Tú lo anotas</span>
           <span className="min-w-6 flex-1 -translate-y-1 border-b-2 border-dotted border-chalk-dim/60" aria-hidden />
           <span className="font-semibold text-chalk">tu coach lo ve al momento</span>
@@ -154,6 +154,35 @@ export function Login() {
         </motion.form>
         <PrivacySheet open={privacy} onClose={() => setPrivacy(false)} />
       </div>
+    </div>
+  );
+}
+
+const FoodScene = lazy(() => import('./ui/FoodScene'));
+
+function hasWebGL() {
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl2') || c.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+
+/** Fondo del acceso: hojas verdes y comida en 3D (WebGL). Sin WebGL, el menú en tiza. */
+function Backdrop() {
+  const [gl, setGl] = useState(hasWebGL);
+  const [ready, setReady] = useState(false);
+  if (!gl) return <MenuBackdrop />;
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      <div className={`absolute inset-0 transition-opacity duration-[1200ms] ease-out ${ready ? 'opacity-100' : 'opacity-0'}`}>
+        <Suspense fallback={null}>
+          <FoodScene onReady={() => setReady(true)} onFail={() => setGl(false)} />
+        </Suspense>
+      </div>
+      {/* Velo de pizarra detrás del titular para que siempre se lea bien */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,color-mix(in_oklab,var(--board)_62%,transparent)_0%,color-mix(in_oklab,var(--board)_34%,transparent)_40%,transparent_60%,color-mix(in_oklab,var(--board)_30%,transparent)_100%)]" />
     </div>
   );
 }
