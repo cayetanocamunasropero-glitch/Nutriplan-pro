@@ -258,7 +258,28 @@ for (const [w, h, tag] of [
       await p.getByRole('button', { name: 'Plan', exact: true }).click();
       await p.locator('input[type=file]').setInputFiles(process.env.PDF);
       await p.getByText('Objetivo diario').waitFor({ timeout: 30000 });
-      ok(await p.getByText('Macros completos').isVisible(), 'PDF importado con macros completos');
+      const report = await p.locator('text=/\\d+ comidas · \\d+ opciones/').first().textContent();
+      console.log('   informe:', report);
+      const complete = await p.getByText('Macros completos').isVisible();
+      if (!complete) {
+        // Formato «menú»: lo que falte se completa a mano en el editor (aquí con valores de prueba)
+        // las filas dejan de estar marcadas al completarse: rellenar siempre la primera casilla vacía
+        for (let guard = 0; guard < 400; guard++) {
+          const cells = p.locator('tr.bg-carb\\/10 input[inputmode=decimal]');
+          if (!(await cells.count())) break;
+          let filled = false;
+          for (let k = 0; k < (await cells.count()); k++) {
+            if (!(await cells.nth(k).inputValue())) {
+              await cells.nth(k).fill('10');
+              filled = true;
+              break;
+            }
+          }
+          if (!filled) break;
+        }
+        await p.waitForTimeout(300);
+      }
+      ok(await p.getByText('Macros completos').isVisible(), 'PDF importado y macros completos (' + (complete ? 'automático' : 'tras completar a mano') + ')');
       await p.screenshot({ path: `${OUT}/26-coach-pdf-${tag}.png` });
       p.once('dialog', (d) => d.accept());
       await p.getByRole('button', { name: /Publicar para/ }).click();

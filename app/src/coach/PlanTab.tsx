@@ -27,15 +27,33 @@ export function PlanTab({ row, reload, toast }: { row: Row; reload: () => void; 
     setErr('');
     setBusy(true);
     try {
-      const { parseDietPdf } = await import('../lib/pdf/parse');
+      const [{ parseDietPdf }, menu, foods, data] = await Promise.all([import('../lib/pdf/parse'), import('../lib/pdf/menu'), import('../lib/foods'), import('../lib/data')]);
       const r = await parseDietPdf(f);
+      let fillNote = '';
+      if (r.kind === 'menu') {
+        // El formato «menú con opciones» no trae macros por alimento: se completan con tus planes, la biblioteca y el catálogo.
+        const pubs = await data.listPublished().catch(() => []);
+        const refs = [...menu.refsFromPlans(pubs.map((p) => p.content || {})), ...foods.LIBRARY];
+        const st = await menu.fillMacros(r.groups as never, refs, (q) => foods.searchCatalog(q));
+        fillNote = ` Valores: ${st.fromPlans} de tus planes o la biblioteca, ${st.fromTotals} calculados con el total del PDF${st.fromCatalog ? `, ${st.fromCatalog} del catálogo (revísalos)` : ''}${st.missing ? `, ${st.missing} por completar` : ''}.`;
+      }
       const t = r.target?.kcal ? r.target : target;
       setDraft({
         title: f.name.replace(/\.pdf$/i, '').replace(/_/g, ' '),
-        groups: r.groups.map((g) => ({ name: g.name, share: g.share, options: g.options.map((o) => ({ letter: o.letter, title: o.title, notes: o.notes, items: o.items.map((i) => ({ name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f })) })) })),
+        groups: r.groups.map((g) => ({
+          name: g.name,
+          share: g.share,
+          options: g.options.map((o) => ({
+            letter: o.letter,
+            title: o.title,
+            notes: o.notes,
+            ...(o.pdfKcal != null ? { pdfKcal: o.pdfKcal } : {}),
+            items: o.items.map((i) => ({ name: i.name, grams: +i.grams, kcal: +i.kcal, c: +i.c, p: +i.p, f: +i.f, ...(i.unit ? { unit: i.unit } : {}), ...(i.portion ? { portion: i.portion } : {}) })),
+          })),
+        })),
         target: { kcal: +(t.kcal || 0), c: +(t.c || 0), p: +(t.p || 0), f: +(t.f || 0) },
         source: 'pdf',
-        report: r.report ? `${r.report.groups} comidas · ${r.report.options} opciones · ${r.report.ingredients} ingredientes` : undefined,
+        report: (r.report ? `${r.report.groups} comidas · ${r.report.options} opciones · ${r.report.ingredients} ingredientes.` : '') + fillNote,
       });
     } catch (e) {
       setErr('No se pudo leer el PDF: ' + errText(e));
@@ -179,7 +197,7 @@ function Editor({ draft, setDraft, row, done, toast }: { draft: Draft; setDraft:
       <div className={`mt-3 flex items-start gap-2 rounded-2xl p-3 text-sm ${bad ? 'bg-carb/12 text-carb-ink' : 'bg-brand-soft text-brand'}`}>
         {bad ? <AlertTriangle className="mt-0.5 size-4 shrink-0" /> : <CheckCircle2 className="mt-0.5 size-4 shrink-0" />}
         <span>
-          {draft.report ? draft.report + '. ' : ''}
+          {draft.report ? draft.report.replace(/\.?$/, '. ') : ''}
           {bad ? `${bad} ingredientes sin macros: complétalos abajo (valores por 100 g).` : 'Macros completos. Revisa los totales y publica.'}
         </span>
       </div>
