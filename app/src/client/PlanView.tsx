@@ -36,7 +36,7 @@ export function planGroups(plan: PublishedPlan): PlanGroup[] {
   return [];
 }
 
-const toLog = (it: PlanOptionItem): LogItem => ({ name: it.name, grams: +it.grams || 0, kcal: +it.kcal || 0, c: +it.c || 0, p: +it.p || 0, f: +it.f || 0, source: 'Tu plan' });
+export const toLog = (it: PlanOptionItem): LogItem => ({ name: it.name, grams: +it.grams || 0, kcal: +it.kcal || 0, c: +it.c || 0, p: +it.p || 0, f: +it.f || 0, source: 'Tu plan' });
 
 export function PlanView({ plan, uid, day, onError, goToday }: { plan: PublishedPlan; uid: string; day: string; onError: (m: string) => void; goToday: () => void }) {
   const toast = useToast();

@@ -28,7 +28,7 @@ export function Tips({ hasPlan }: { hasPlan: boolean }) {
       </h2>
       <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-snug text-ink marker:font-bold marker:text-ink">
         <li>Pulsa el botón amarillo «+» para anotar lo que comes. Busca, escanea el código de barras o usa tus recientes.</li>
-        {hasPlan && <li>En «Mi plan» registras una opción completa de tu menú con un solo toque.</li>}
+        {hasPlan && <li>Bajo cada comida, «Del plan» registra una opción de tu menú con un toque. En «Mi plan» eliges combinaciones y cambias alimentos.</li>}
         <li>Toca un alimento anotado para cambiar la cantidad o quitarlo.</li>
         <li>Todo se guarda solo y tu coach lo ve al momento.</li>
       </ol>
