@@ -122,23 +122,23 @@ export function CoachApp({ session }: { session: Session }) {
       {/* Lista */}
       <aside className={`${sel ? 'hidden lg:flex' : 'flex'} min-h-dvh flex-col border-line lg:h-dvh lg:min-h-0 lg:w-[400px] lg:shrink-0 lg:border-r`}>
         <h1 className="sr-only">Panel del coach</h1>
-        <div className="px-4 pb-3 pt-5">
-          <div className="flex items-center gap-3">
+        <div className="bg-board px-4 pb-4 text-chalk" style={{ paddingTop: 'max(20px, calc(env(safe-area-inset-top) + 12px))' }}>
+          <div className="flex items-center gap-1">
             <Logo size={38} />
-            <div className="min-w-0 flex-1">
-              <p className="whitespace-nowrap font-display text-lg font-bold leading-none">NutriPlan Coach</p>
-              <p className="mt-1 truncate text-xs text-muted">{session.user.email}</p>
+            <div className="ml-2 min-w-0 flex-1">
+              <p className="caps whitespace-nowrap text-[22px] leading-none">NutriPlan Coach</p>
+              <p className="mt-1 truncate text-xs text-chalk-dim">{session.user.email}</p>
             </div>
-            <IconButton onClick={load} aria-label="Actualizar">
+            <IconButton onClick={load} aria-label="Actualizar" className="!text-chalk hover:!bg-board-2">
               <RefreshCw className={`size-4.5 ${refreshing ? 'animate-spin' : ''}`} />
             </IconButton>
-            <IconButton onClick={() => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')} aria-label="Cambiar tema">
+            <IconButton onClick={() => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')} aria-label="Cambiar tema" className="!text-chalk hover:!bg-board-2">
               {theme === 'dark' || (theme === 'system' && document.documentElement.dataset.theme === 'dark') ? <Sun className="size-4.5" /> : <Moon className="size-4.5" />}
             </IconButton>
-            <IconButton onClick={() => window.open(ORIGIN + '/clasica', '_blank', 'noopener')} aria-label="Versión clásica (editor avanzado)" title="Versión clásica (editor avanzado y generador)">
+            <IconButton onClick={() => window.open(ORIGIN + '/clasica', '_blank', 'noopener')} aria-label="Versión clásica (editor avanzado)" title="Versión clásica (editor avanzado y generador)" className="!text-chalk hover:!bg-board-2">
               <History className="size-4.5" />
             </IconButton>
-            <IconButton onClick={signOut} aria-label="Cerrar sesión">
+            <IconButton onClick={signOut} aria-label="Cerrar sesión" className="!text-chalk hover:!bg-board-2">
               <LogOut className="size-4.5" />
             </IconButton>
           </div>
@@ -148,7 +148,8 @@ export function CoachApp({ session }: { session: Session }) {
             <Kpi value={String(active)} label="activos 7 d" sub={`${todayCount} hoy`} onClick={() => setFilter('active')} on={filter === 'active'} />
             <Kpi value={String(alerts)} label="sin registrar" sub="≥ 3 días" onClick={() => setFilter('alert')} on={filter === 'alert'} warn={alerts > 0} />
           </div>
-
+        </div>
+        <div className="px-4 pb-3">
           <div className="mt-4 flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-faint" />
@@ -207,10 +208,10 @@ export function CoachApp({ session }: { session: Session }) {
 
 function Kpi({ value, label, sub, onClick, on, warn }: { value: string; label: string; sub: string; onClick: () => void; on: boolean; warn?: boolean }) {
   return (
-    <button onClick={onClick} className={`rounded-[20px] p-3 text-left transition ${on ? 'bg-ink text-bg' : 'bg-surface shadow-card'}`}>
-      <div className={`font-display text-2xl font-extrabold leading-none tnum ${warn && !on ? 'text-fat-ink' : ''}`}>{value}</div>
-      <div className={`mt-1 text-[11px] font-bold ${on ? 'text-bg/80' : 'text-ink'}`}>{label}</div>
-      <div className={`text-[11px] ${on ? 'text-bg/80' : 'text-muted'}`}>{sub}</div>
+    <button onClick={onClick} aria-pressed={on} className={`rounded-[12px] p-3 text-left transition-colors ${on ? 'bg-chalk text-board' : 'bg-board-2 text-chalk hover:bg-board-2/70'}`}>
+      <div className={`font-display text-[30px] font-extrabold leading-none tnum ${warn ? (on ? 'text-fat-ink' : 'text-accent') : ''}`}>{value}</div>
+      <div className="mt-1 text-[12px] font-bold">{label}</div>
+      <div className={`text-[12px] ${on ? 'text-board/80' : 'text-chalk-dim'}`}>{sub}</div>
     </button>
   );
 }
@@ -219,8 +220,8 @@ function ClientRow({ r, on, onClick }: { r: Row; on: boolean; onClick: () => voi
   const days = lastDays(today(), 7);
   const logged = new Set(r.logs.filter((l) => (l.entries || []).some(isFood)).map((l) => l.log_date));
   return (
-    <button onClick={onClick} className={`flex w-full items-center gap-3 rounded-[22px] p-3 text-left transition ${on ? 'bg-brand-soft' : 'hover:bg-surface'}`}>
-      <span className="relative grid size-12 shrink-0 place-items-center rounded-2xl bg-surface-2 font-display text-lg font-bold">
+    <button onClick={onClick} aria-current={on ? 'true' : undefined} className={`flex w-full items-center gap-3 rounded-[12px] border-2 p-3 text-left transition-colors ${on ? 'border-rule bg-surface' : 'border-transparent hover:bg-surface'}`}>
+      <span className="caps relative grid size-12 shrink-0 place-items-center rounded-full bg-board text-[22px] text-chalk">
         {(r.c.name || '?').trim().charAt(0).toUpperCase()}
         <span className={`absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full border-2 border-bg ${r.status === 'linked' ? 'bg-ok' : r.status === 'pending' ? 'bg-carb' : 'bg-faint'}`} title={r.status === 'linked' ? 'Usa la app' : r.status === 'pending' ? 'Invitación pendiente' : 'Sin acceso'} />
       </span>

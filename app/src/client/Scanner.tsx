@@ -53,13 +53,13 @@ export function Scanner({ onCode }: { onCode: (code: string) => void }) {
   return (
     <div>
       {supported && !err ? (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-black">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[16px] bg-black">
           <video ref={video} className="size-full object-cover" playsInline muted />
-          <div className="pointer-events-none absolute inset-x-10 top-1/2 h-24 -translate-y-1/2 rounded-2xl border-2 border-lime/90 shadow-[0_0_0_999px_rgba(0,0,0,.35)]" />
+          <div className="pointer-events-none absolute inset-x-10 top-1/2 h-24 -translate-y-1/2 rounded-[12px] border-2 border-accent shadow-[0_0_0_999px_rgba(0,0,0,.35)]" />
           <p className="absolute inset-x-0 bottom-3 text-center text-xs font-semibold text-white/85">Apunta al código de barras del envase</p>
         </div>
       ) : (
-        <p className="rounded-2xl bg-surface-2 p-4 text-sm text-muted">{err || 'Este navegador no puede leer códigos con la cámara. Escribe los números del código de barras.'}</p>
+        <p className="rounded-[12px] bg-surface-2 p-4 text-sm text-muted">{err || 'Este navegador no puede leer códigos con la cámara. Escribe los números del código de barras.'}</p>
       )}
       <div className="mt-4 flex gap-2">
         <div className="relative flex-1">

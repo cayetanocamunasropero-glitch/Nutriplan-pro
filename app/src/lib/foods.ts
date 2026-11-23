@@ -36,7 +36,7 @@ export function searchLibrary(q: string, extra: Food[] = []): Food[] {
     .slice(0, 30);
 }
 
-type OFFProduct = { code?: string; product_name_es?: string; product_name?: string; brands?: string; nutriments?: Record<string, unknown>; serving_size?: string; quantity?: string };
+type OFFProduct = { code?: string; product_name_es?: string; product_name?: string; brands?: string; nutriments?: Record<string, unknown>; serving_size?: string; quantity?: string; nutriscore_grade?: string };
 
 export function fromOFF(p: OFFProduct | null | undefined): Food | null {
   if (!p) return null;
@@ -69,10 +69,11 @@ export function fromOFF(p: OFFProduct | null | undefined): Food | null {
     portion: serving > 0 && serving < 1000 ? serving : 100,
     portionLabel: serving > 0 ? 'ración del envase' : '',
     source: 'Open Food Facts',
+    ...(/^[a-e]$/i.test(p.nutriscore_grade || '') ? { nutriscore: p.nutriscore_grade!.toLowerCase() } : {}),
   };
 }
 
-const OFF_FIELDS = 'code,product_name_es,product_name,brands,stores,nutriments,serving_size,quantity,nutrition_data_per';
+const OFF_FIELDS = 'code,product_name_es,product_name,brands,stores,nutriments,serving_size,quantity,nutrition_data_per,nutriscore_grade';
 
 /** Primero el proxy propio (/api/foods, en Vercel). Si no existe (p. ej. GitHub Pages), Open Food Facts directo. */
 async function offQuery(params: Record<string, string>, signal?: AbortSignal): Promise<{ products?: OFFProduct[]; product?: OFFProduct | null }> {

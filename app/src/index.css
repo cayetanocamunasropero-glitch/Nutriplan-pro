@@ -3,19 +3,29 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 :root {
-  --bg: #f3f2ec;
+  /* NutriPlan · «Menú del día» + «Información nutricional»
+     Papel claro y tinta para el contenido; pizarra para cabeceras y navegación; mostaza como acento. */
+  --bg: #f1f2ee;
   --surface: #ffffff;
-  --surface-2: #ecebe3;
-  --surface-3: #e2e1d7;
-  --ink: #0f241d;
-  --muted: #4f5c55;
-  --faint: #5f6b64;
-  --line: rgba(15, 36, 29, 0.09);
-  --brand: #1e5b49;
-  --brand-2: #164536;
-  --brand-soft: #dceee5;
-  --on-brand: #ffffff;
-  --lime: #c9f26b;
+  --surface-2: #e8eae5;
+  --surface-3: #dadcd6;
+  --ink: #121714;
+  --muted: #4a524c;
+  --faint: #59615b;
+  --line: rgba(18, 23, 20, 0.12);
+  --rule: #121714;
+  --board: #17231d;
+  --board-2: #22342b;
+  --chalk: #f0ece0;
+  --chalk-dim: #b9bfb4;
+  --brand: #17231d;
+  --brand-2: #22342b;
+  --brand-soft: #dff1e6;
+  --on-brand: #f0ece0;
+  --go: #1f6b4a;
+  --accent: #e8b638;
+  --on-accent: #17231d;
+  --lime: var(--accent);
   --c-carb: #d48f1f;
   --c-prot: #4a74e8;
   --c-fat: #e8603e;
@@ -25,26 +35,34 @@
   --c-fat-ink: #b23f22;
   --c-water-strong: #16729f;
   --danger: #b3381f;
-  --ok: #2f8f5b;
-  --shadow: 0 1px 2px rgba(15, 36, 29, 0.05), 0 8px 24px -12px rgba(15, 36, 29, 0.16);
-  --shadow-lg: 0 24px 60px -20px rgba(15, 36, 29, 0.35);
+  --ok: #1f6b4a;
+  --shadow: none;
+  --shadow-lg: 0 24px 60px -20px rgba(18, 23, 20, 0.4);
   color-scheme: light;
 }
 
+/* Oscuro: la pizarra completa */
 [data-theme='dark'] {
-  --bg: #0b1210;
-  --surface: #131c18;
-  --surface-2: #1a2520;
-  --surface-3: #233029;
-  --ink: #e9f1ec;
-  --muted: #95a59d;
-  --faint: #86958e;
-  --line: rgba(233, 241, 236, 0.08);
-  --brand: #5cc492;
-  --brand-2: #7dd6aa;
-  --brand-soft: #1b3329;
-  --on-brand: #06140e;
-  --lime: #c9f26b;
+  --bg: #101a15;
+  --surface: #17251e;
+  --surface-2: #1f3028;
+  --surface-3: #2a3d33;
+  --ink: #f0ece0;
+  --muted: #bcc2b7;
+  --faint: #a3ab9f;
+  --line: rgba(240, 236, 224, 0.12);
+  --rule: rgba(240, 236, 224, 0.85);
+  --board: #0a110d;
+  --board-2: #17251e;
+  --chalk: #f0ece0;
+  --chalk-dim: #b9bfb4;
+  --brand: #f0ece0;
+  --brand-2: #dcd6c4;
+  --brand-soft: #22342b;
+  --on-brand: #17231d;
+  --go: #8fd3b0;
+  --accent: #e8b638;
+  --on-accent: #17231d;
   --c-carb: #bb7f17;
   --c-prot: #6f8cf5;
   --c-fat: #e06a4c;
@@ -52,9 +70,9 @@
   --c-carb-ink: #e0a64a;
   --c-fat-ink: #ff8a6b;
   --c-water-strong: #1d7fb0;
-  --danger: #ff7a63;
-  --ok: #5cc492;
-  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 30px -14px rgba(0, 0, 0, 0.6);
+  --danger: #ff8a6b;
+  --ok: #8fd3b0;
+  --shadow: none;
   --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
   color-scheme: dark;
 }
@@ -73,6 +91,14 @@
   --color-brand-soft: var(--brand-soft);
   --color-on-brand: var(--on-brand);
   --color-lime: var(--lime);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-rule: var(--rule);
+  --color-board: var(--board);
+  --color-board-2: var(--board-2);
+  --color-chalk: var(--chalk);
+  --color-chalk-dim: var(--chalk-dim);
+  --color-go: var(--go);
   --color-carb: var(--c-carb);
   --color-prot: var(--c-prot);
   --color-fat: var(--c-fat);
@@ -82,8 +108,8 @@
   --color-water-strong: var(--c-water-strong);
   --color-danger: var(--danger);
   --color-ok: var(--ok);
-  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Barlow', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --shadow-card: var(--shadow);
   --shadow-pop: var(--shadow-lg);
   /* Movimiento: curvas fuertes (Emil Kowalski) y transiciones cortas por defecto */
@@ -92,6 +118,16 @@
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --default-transition-duration: 160ms;
   --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Fondo del acceso: el menú del día desfila (movimiento constante → lineal) */
+  --animate-crawl: crawl 70s linear infinite;
+  @keyframes crawl {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, -50%, 0);
+    }
+  }
 }
 
 html,
@@ -109,7 +145,6 @@ body {
 }
 #root {
   min-height: 100dvh;
-  padding-top: env(safe-area-inset-top);
 }
 button {
   cursor: pointer;
@@ -129,11 +164,14 @@ html {
 button:disabled {
   cursor: default;
 }
-input,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
+@layer base {
+  /* En capa base para que las clases de tamaño/tipografía de Tailwind puedan sobrescribirlo */
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
 }
 :focus-visible {
   outline: 2.5px solid var(--brand);
@@ -149,6 +187,20 @@ h1,
 h2,
 h3 {
   text-wrap: balance;
+}
+/* Rotulación: títulos, cifras y botones (nunca párrafos) */
+@utility caps {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.015em;
+  font-weight: 800;
+}
+/* Línea de puntos del menú hasta la cifra */
+@utility leader {
+  flex: 1 1 auto;
+  min-width: 12px;
+  border-bottom: 2px dotted color-mix(in oklab, var(--ink) 35%, transparent);
+  transform: translateY(-5px);
 }
 .tnum {
   font-variant-numeric: tabular-nums;
@@ -184,11 +236,13 @@ h3 {
   padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
 /* En móvil, los campos de menos de 16px hacen que iOS amplíe la página al tocarlos */
-@media (pointer: coarse) {
-  input,
-  select,
-  textarea {
-    font-size: max(16px, 1em);
+@layer base {
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: max(16px, 1em);
+    }
   }
 }
 /* Movimiento reducido: sin desplazamientos ni escalas; se mantienen los cambios de color/opacidad.

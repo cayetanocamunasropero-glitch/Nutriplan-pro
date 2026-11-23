@@ -65,7 +65,7 @@ export function ProfileTab({ row, save, reload, toast }: { row: Row; save: (c: C
           <Label>Actividad</Label>
           <div className="no-scrollbar flex gap-1.5 overflow-x-auto">
             {ACT.map(([v, l]) => (
-              <button key={v} onClick={() => set('activity', v)} className={`shrink-0 rounded-xl px-3 py-2 text-sm font-semibold ${String(c.activity) === v ? 'bg-ink text-bg' : 'bg-surface-2 text-muted'}`}>
+              <button key={v} onClick={() => set('activity', v)} className={`shrink-0 rounded-full border-2 px-3 py-1.5 text-sm font-semibold ${String(c.activity) === v ? 'border-rule bg-brand text-on-brand' : 'border-line bg-surface text-muted hover:border-rule'}`}>
                 {l} <span className="opacity-80">×{v}</span>
               </button>
             ))}
@@ -105,7 +105,7 @@ export function ProfileTab({ row, save, reload, toast }: { row: Row; save: (c: C
             <div className="text-[11px] opacity-80">mantenimiento</div>
           </div>
           <div>
-            <div className="font-display text-3xl font-extrabold text-lime tnum">{t ? n0(t.kcal) : '—'}</div>
+            <div className="font-display text-3xl font-extrabold text-accent tnum">{t ? n0(t.kcal) : '—'}</div>
             <div className="text-[11px] opacity-80">objetivo kcal</div>
           </div>
         </div>

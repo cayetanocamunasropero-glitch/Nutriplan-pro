@@ -25,8 +25,8 @@ La app nueva usa **las mismas tablas y formatos** que la clásica; ambas pueden 
 ## Comandos (desde `app/`)
 - `npm run dev` · `npm run build`
 - `npm run test:e2e` → Playwright con Supabase simulado (`tests/mock.mjs`), 20+ comprobaciones de compatibilidad de datos. `PDF=/ruta.pdf` añade la prueba de importación.
-- `npm run test:pdf` → lector de PDF sobre `legacy/pdf_pruebas/` (carpeta local, ignorada por git).
-- `npm run test:audit` → detector de Impeccable sobre cada pantalla renderizada (contraste, tamaños, títulos…). Avisos aceptados a propósito: `cream-palette` y `overused-font` (identidad de marca).
+- `npm run test:pdf` → lectores de PDF (tabla y «menú con opciones», `lib/pdf/menu.ts`) sobre `legacy/pdf_pruebas/` (carpeta local, ignorada por git).
+- `npm run test:audit` → detector de Impeccable sobre cada pantalla renderizada (contraste, tamaños, títulos…). Objetivo: 0 hallazgos.
 
 ## APK
 La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la escribe con `document.write` desde `file://`. La app nueva es compatible (probado): sin rutas por URL, `ORIGIN`/`NP_ORIGIN` para llamadas a `/api`, CORS en assets, `window.npBack`. Las mejoras llegan sin reinstalar.
@@ -36,13 +36,16 @@ La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la
 - La app usa rutas relativas (`base: './'`), funciona en raíz o en subcarpeta.
 Vercel team `team_CNO0OyROIW0IYun3Vrwgzak8`, proyecto `prj_8XKbo9Zs5S2h3IhsNrzC3ZZ4VsdF` (nutriplan-asesoria). Publicar en producción **solo con el OK explícito de Cayetano** (la usan clientes reales). Probar antes en una vista previa.
 
-## Diseño (tokens en `app/src/index.css`)
-- Texto secundario: `muted`/`faint` (≥4,5:1). Para texto de color usar `text-carb-ink`, `text-fat-ink`; `carb`/`fat`/`prot` solo para marcas (barras, puntos). Fondos de color en tarjetas: `<Card tone="brand|ink">`, nunca `bg-*` por className.
-- Movimiento: curvas `--ease-out`/`--ease-drawer`, animar `transform`/`opacity` (no width/height), `MotionConfig reducedMotion="user"`. La hoja inferior se cierra arrastrando.
+## Diseño (tokens en `app/src/index.css`; decisión en `.impeccable/surfaces/app-src.md`, producto en `PRODUCT.md`)
+- Look «Menú del día + Información nutricional» (elegido por Cayetano, nov 2026): cabeceras y navegación en pizarra (`bg-board`, `text-chalk`, `<BoardHeader>`), contenido en papel claro con tinta (`border-rule`), acento mostaza (`bg-accent`, botón «+»), Barlow Condensed rotulada (`caps`) para títulos/cifras/botones y Barlow para texto. Oscuro = pizarra completa.
+- Firma: resumen del día como tabla nutricional (reglas 8/3/1 px), comidas y opciones con línea de puntos (`leader`), Nutri-Score real de Open Food Facts (`<NutriScore>`).
+- Texto secundario `muted`/`faint` (≥4,5:1); texto de color con `text-carb-ink`/`text-fat-ink`/`text-go`; `carb`/`prot`/`fat` solo para marcas. Tarjetas: `<Card>` (borde de tinta) o `tone="brand|ink"`, nunca `bg-*` por className.
+- Movimiento: `--ease-out`/`--ease-drawer`, solo `transform`/`opacity`, `MotionConfig reducedMotion="user"`; la hoja inferior se cierra arrastrando.
+- Resets de `input`/`select` en `@layer base` (si no, pisan las clases de tamaño).
 
 ## Skills del proyecto (`.claude/skills/`, ver su README)
 Para la app (es una app, no una landing):
-- Diseño: `impeccable` (auditar/criticar, evita el «AI slop»), `web-design-guidelines`, `ui-ux-pro-max`. Respetar el sistema de diseño actual (tokens en `app/src/index.css`, Bricolage Grotesque + Instrument Sans, verde #1E5B49 + lima, macros validados para daltonismo).
+- Diseño: `impeccable` (auditar/criticar, evita el «AI slop»), `web-design-guidelines`, `ui-ux-pro-max`. Respetar el sistema de diseño actual (ver «Diseño»; macros validados para daltonismo).
 - Animación: skills de Emil Kowalski (`review-animations`, `improve-animations`, `emil-design-eng`); respetar `prefers-reduced-motion`.
 - Rendimiento React: `vercel-react-best-practices`.
 - Para webs comerciales/landing (no la app): `design-taste-frontend`, `scroll-world`, `refero-design`.

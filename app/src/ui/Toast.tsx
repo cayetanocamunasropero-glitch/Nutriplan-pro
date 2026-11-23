@@ -27,14 +27,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 initial={{ y: -30, opacity: 0, scale: 0.95 }}
                 animate={{ y: 0, opacity: 1, scale: 1 }}
                 exit={{ y: -20, opacity: 0 }}
-                className="pointer-events-auto flex max-w-sm items-center gap-2.5 rounded-2xl bg-ink px-4 py-3 text-sm font-medium text-bg shadow-pop"
+                className="pointer-events-auto flex max-w-sm items-center gap-2.5 rounded-[12px] bg-ink px-4 py-3 text-sm font-medium text-bg shadow-pop"
                 role="status"
               >
-                {t.bad ? <CircleAlert className="size-4.5 shrink-0 text-fat" /> : <CircleCheck className="size-4.5 shrink-0 text-lime" />}
+                {t.bad ? <CircleAlert className="size-4.5 shrink-0 text-fat" /> : <CircleCheck className="size-4.5 shrink-0 text-accent" />}
                 <span>{t.text}</span>
                 {t.action && (
                   <button
-                    className="ml-1 rounded-lg px-2 py-1 font-bold text-lime"
+                    className="ml-1 rounded-lg px-2 py-1 font-bold text-accent"
                     onClick={() => {
                       t.action!.run();
                       setList((l) => l.filter((x) => x.id !== t.id));

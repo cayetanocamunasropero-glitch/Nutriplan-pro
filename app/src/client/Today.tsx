@@ -5,8 +5,8 @@ import { getLogs } from '../lib/data';
 import { lastDays, pretty, shift, today, weekdayLetter } from '../lib/dates';
 import { entriesMacros, itemMacros, itemsMacros, n0, n1, planTarget, SLOTS, slotForNow, slotOf, isFood, unitOf } from '../lib/nutrition';
 import type { Food, LogEntry, LogItem, MealLog, PublishedPlan } from '../lib/types';
-import { MacroBar, Ring } from '../ui/Charts';
-import { Button, Card, IconButton } from '../ui/kit';
+import { BoardHeader, NutriScore } from '../ui/Board';
+import { Button, Card } from '../ui/kit';
 import { Sheet } from '../ui/Sheet';
 import { useToast } from '../ui/Toast';
 import { AddFood, PortionStep } from './AddFood';
@@ -96,90 +96,128 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
   const hello = hour < 6 ? 'Buenas noches' : hour < 14 ? 'Buenos días' : hour < 21 ? 'Buenas tardes' : 'Buenas noches';
   const yesterday = week.find((w) => w.log_date === shift(day, -1));
 
+  const over = goal.kcal > 0 && left < 0;
+  const MACROS = [
+    ['Hidratos', tot.c, goal.c, 'var(--c-carb)'],
+    ['Proteínas', tot.p, goal.p, 'var(--c-prot)'],
+    ['Grasas', tot.f, goal.f, 'var(--c-fat)'],
+  ] as const;
+
   return (
-    <div className="px-4 pt-5">
-      {/* Cabecera */}
-      <header className="flex items-start justify-between px-1">
-        <div>
-          <h1 className="font-display text-[28px] font-extrabold leading-tight tracking-tight">
+    <div className="px-4">
+      <BoardHeader
+        title={
+          <>
             {hello}
             {name ? <>, {name}</> : ''}
-          </h1>
-          <p className="mt-0.5 text-sm text-muted">{pretty(day) === 'Hoy' ? new Date(day + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) : pretty(day)}</p>
-        </div>
-        <div className="mt-1 flex items-center gap-2">
-          {streak > 0 && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-fat/12 px-3 py-1.5 text-sm font-bold text-fat-ink" title="Días seguidos registrando">
-              <Flame className="size-4" />
-              {streak}
+          </>
+        }
+        subtitle={pretty(day) === 'Hoy' ? new Date(day + 'T12:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) : pretty(day)}
+        right={
+          <>
+            {streak > 0 && (
+              <span className="caps inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[15px] text-on-accent" title="Días seguidos registrando">
+                <Flame className="size-4" />
+                {streak} {streak === 1 ? 'día' : 'días'}
+              </span>
+            )}
+            <span className="grid size-8 place-items-center text-chalk-dim" aria-live="polite" title={d.saving ? 'Guardando…' : 'Guardado'}>
+              {d.saving ? <Loader2 className="size-4.5 animate-spin" /> : <CloudCheck className="size-4.5" />}
             </span>
-          )}
-          <span className="grid size-9 place-items-center text-faint" aria-live="polite" title={d.saving ? 'Guardando…' : 'Guardado'}>
-            {d.saving ? <Loader2 className="size-4.5 animate-spin" /> : <CloudCheck className="size-4.5" />}
-          </span>
+          </>
+        }
+      >
+        {/* Selector de día */}
+        <div className="mt-4 flex items-center gap-1">
+          <button onClick={() => setDay(shift(day, -1))} aria-label="Día anterior" className="grid size-9 place-items-center rounded-full text-chalk-dim hover:text-chalk">
+            <ChevronLeft className="size-5" />
+          </button>
+          <div className="grid flex-1 grid-cols-7 gap-1">
+            {strip.map((s) => {
+              const has = s === day ? food.length > 0 : week.some((w) => w.log_date === s && (w.entries || []).some(isFood));
+              const on = s === day;
+              const future = s > today();
+              return (
+                <button
+                  key={s}
+                  disabled={future}
+                  onClick={() => setDay(s)}
+                  aria-pressed={on}
+                  aria-label={pretty(s) + (has ? ', con registros' : '')}
+                  className={`flex flex-col items-center rounded-[12px] py-1.5 transition-colors disabled:opacity-30 ${on ? 'bg-chalk text-board' : 'text-chalk hover:bg-board-2'}`}
+                >
+                  <span className={`text-[11px] font-semibold ${on ? 'text-board/70' : 'text-chalk-dim'}`}>{weekdayLetter(s)}</span>
+                  <span className="font-display text-[19px] font-bold leading-tight tnum">{+s.slice(8)}</span>
+                  <span className={`size-1.5 rounded-full ${has ? 'bg-accent' : 'bg-transparent'}`} />
+                </button>
+              );
+            })}
+          </div>
+          <button onClick={() => setDay(shift(day, 1))} disabled={day >= today()} aria-label="Día siguiente" className="grid size-9 place-items-center rounded-full text-chalk-dim hover:text-chalk disabled:opacity-30">
+            <ChevronRight className="size-5" />
+          </button>
         </div>
-      </header>
+        {day !== today() && (
+          <button onClick={() => setDay(today())} className="mx-auto mt-2 block text-xs font-bold text-accent">
+            Volver a hoy
+          </button>
+        )}
+      </BoardHeader>
 
-      {/* Selector de día */}
-      <div className="mt-4 flex items-center gap-1">
-        <IconButton onClick={() => setDay(shift(day, -1))} aria-label="Día anterior">
-          <ChevronLeft className="size-5" />
-        </IconButton>
-        <div className="grid flex-1 grid-cols-7 gap-1">
-          {strip.map((s) => {
-            const has = s === day ? food.length > 0 : week.some((w) => w.log_date === s && (w.entries || []).some(isFood));
-            const on = s === day;
-            const future = s > today();
+      {/* Resumen del día: información nutricional */}
+      <section className="mt-4 rounded-[8px] border-[3px] border-rule bg-surface px-4 pb-3 pt-3" aria-labelledby="label-title">
+        <h2 id="label-title" className="caps text-[24px] leading-none">
+          Información nutricional · {pretty(day) === 'Hoy' ? 'hoy' : pretty(day).toLowerCase()}
+        </h2>
+        <div className="mt-2 h-2 bg-rule" aria-hidden />
+        {goal.kcal > 0 ? (
+          <div className="mt-2 flex items-end justify-between gap-3">
+            <div>
+              <p className={`text-xs font-bold uppercase tracking-wide ${over ? 'text-fat-ink' : 'text-muted'}`}>{over ? 'Te has pasado' : 'Te quedan'}</p>
+              <p className="font-display text-[60px] font-extrabold leading-[0.85] tnum">
+                {n0(Math.abs(left))}
+                <span className="ml-1 text-[22px] font-bold">kcal</span>
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">Llevas</p>
+              <p className="font-display text-[26px] font-extrabold leading-none tnum">
+                {n0(tot.kcal)} / {n0(goal.kcal)}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-2">
+            <p className="text-xs font-bold uppercase tracking-wide text-muted">Llevas</p>
+            <p className="font-display text-[60px] font-extrabold leading-[0.85] tnum">
+              {n0(tot.kcal)}
+              <span className="ml-1 text-[22px] font-bold">kcal</span>
+            </p>
+          </div>
+        )}
+        <div className="mt-2 h-[3px] bg-rule" aria-hidden />
+        <ul>
+          {MACROS.map(([label, v, g, color], i) => {
+            const w = g > 0 ? Math.min(100, (100 * v) / g) : 0;
             return (
-              <button
-                key={s}
-                disabled={future}
-                onClick={() => setDay(s)}
-                className={`flex flex-col items-center rounded-2xl py-2 transition disabled:opacity-30 ${on ? 'bg-ink text-bg' : 'hover:bg-surface-2'}`}
-              >
-                <span className={`text-[11px] font-bold ${on ? 'text-bg/80' : 'text-faint'}`}>{weekdayLetter(s)}</span>
-                <span className="font-display text-base font-bold tnum">{+s.slice(8)}</span>
-                <span className={`mt-0.5 size-1.5 rounded-full ${has ? (on ? 'bg-lime' : 'bg-brand') : 'bg-transparent'}`} />
-              </button>
+              <li key={label} className={`flex items-center justify-between gap-3 py-2 text-[15px] ${i ? 'border-t border-rule' : ''}`}>
+                <b className="font-semibold">{label}</b>
+                <span className="flex items-center gap-3 tnum">
+                  <span>
+                    {n0(v)}
+                    {g > 0 ? ' / ' + n0(g) : ''} g
+                  </span>
+                  {g > 0 && (
+                    <span className="block h-1.5 w-20 overflow-hidden rounded-full bg-surface-2" aria-hidden>
+                      <motion.span className="block h-full origin-left rounded-full" style={{ background: color }} initial={{ scaleX: 0 }} animate={{ scaleX: w / 100 }} transition={{ type: 'spring', duration: 0.6, bounce: 0 }} />
+                    </span>
+                  )}
+                </span>
+              </li>
             );
           })}
-        </div>
-        <IconButton onClick={() => setDay(shift(day, 1))} disabled={day >= today()} aria-label="Día siguiente">
-          <ChevronRight className="size-5" />
-        </IconButton>
-      </div>
-      {day !== today() && (
-        <button onClick={() => setDay(today())} className="mx-auto mt-1 block text-xs font-bold text-brand">
-          {pretty(day)} · Volver a hoy
-        </button>
-      )}
-
-      {/* Resumen */}
-      <Card className="mt-4 overflow-hidden">
-        <div className="flex flex-col items-center">
-          <Ring value={tot.kcal} goal={goal.kcal}>
-            {goal.kcal > 0 ? (
-              <>
-                <span className="font-display text-[46px] font-extrabold leading-none tracking-tight tnum">{n0(Math.abs(left))}</span>
-                <span className="mt-1 text-[13px] font-semibold text-muted">{left >= 0 ? 'kcal restantes' : 'kcal de más'}</span>
-                <span className="mt-2 rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-bold text-muted tnum">
-                  {n0(tot.kcal)} / {n0(goal.kcal)}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="font-display text-[46px] font-extrabold leading-none tracking-tight tnum">{n0(tot.kcal)}</span>
-                <span className="mt-1 text-[13px] font-semibold text-muted">kcal hoy</span>
-              </>
-            )}
-          </Ring>
-        </div>
-        <div className="mt-5 flex gap-4">
-          <MacroBar label="Hidratos" value={tot.c} goal={goal.c} color="var(--c-carb)" />
-          <MacroBar label="Proteínas" value={tot.p} goal={goal.p} color="var(--c-prot)" />
-          <MacroBar label="Grasas" value={tot.f} goal={goal.f} color="var(--c-fat)" />
-        </div>
-      </Card>
+        </ul>
+      </section>
 
       <Tips hasPlan={planFoods.length > 0} />
 
@@ -189,46 +227,46 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
         </div>
       ) : (
         <>
-          {/* Comidas */}
-          <div className="mt-4 space-y-3">
+          {/* Comidas del día, como un menú */}
+          <div className="mt-2 px-1">
             {slots.map((slot) => {
               const list = food.map((e, i) => ({ e, i })).filter(({ e }) => slotOf(e) === slot);
               const st = list.reduce((t, { e }) => t + itemsMacros(e.items).kcal, 0);
               const hasYesterday = (yesterday?.entries || []).some((e) => isFood(e) && slotOf(e) === slot);
-              if (!list.length && (slot === 'Recena' || slot === 'Media mañana'))
-                return (
-                  <button key={slot} onClick={() => setAdding(slot)} className="flex w-full items-center justify-between rounded-[22px] border border-dashed border-line px-5 py-3.5 text-sm font-semibold text-muted hover:bg-surface">
-                    {slot}
-                    <Plus className="size-4.5" />
-                  </button>
-                );
+              const minor = !list.length && (slot === 'Recena' || slot === 'Media mañana');
               return (
-                <Card key={slot} className="!p-0">
-                  <div className="flex items-center justify-between px-5 pb-1 pt-4">
-                    <div>
-                      <h2 className="font-display text-[17px] font-bold">{slot}</h2>
-                      {list.length > 0 && <p className="text-xs font-semibold text-muted tnum">{n0(st)} kcal</p>}
-                    </div>
-                    <button onClick={() => setAdding(slot)} className="grid size-10 place-items-center rounded-full bg-brand text-on-brand shadow-card active:scale-90" aria-label={'Añadir a ' + slot}>
-                      <Plus className="size-5" strokeWidth={2.6} />
+                <section key={slot} className={minor ? 'mt-4' : 'mt-6'} aria-label={slot}>
+                  <div className="flex items-center gap-3">
+                    <h2 className={`caps shrink-0 leading-none ${minor ? 'text-[17px] text-muted' : 'text-[23px]'}`}>{slot}</h2>
+                    <span className={`flex-1 ${minor ? 'h-px bg-line' : 'h-0.5 bg-rule'}`} aria-hidden />
+                    {list.length > 0 && <span className="font-display text-[17px] font-bold tnum">{n0(st)}</span>}
+                    <button
+                      onClick={() => setAdding(slot)}
+                      className={`grid shrink-0 place-items-center rounded-full transition-transform active:scale-95 ${minor ? 'size-8 border-2 border-line text-muted' : 'size-9 bg-brand text-on-brand'}`}
+                      aria-label={'Añadir a ' + slot}
+                    >
+                      <Plus className={minor ? 'size-4' : 'size-5'} strokeWidth={2.6} />
                     </button>
                   </div>
                   {list.length ? (
-                    <ul className="px-2 pb-2">
+                    <ul className="mt-1">
                       <AnimatePresence initial={false}>
                         {list.flatMap(({ e, i }) =>
                           (e.items || []).map((it, ix) =>
                             +it.grams > 0 ? (
-                              <motion.li key={(e.id || e.meal) + ':' + ix} layout initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                                <button onClick={() => setEditing({ entry: i, item: ix })} className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left hover:bg-surface-2">
-                                  <div className="min-w-0 flex-1">
-                                    <div className="truncate text-[15px] font-semibold">{it.name}</div>
-                                    <div className="text-xs text-muted tnum">
+                              <motion.li key={(e.id || e.meal) + ':' + ix} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                                <button onClick={() => setEditing({ entry: i, item: ix })} className="-mx-2 flex w-[calc(100%+16px)] items-baseline gap-2 rounded-[10px] px-2 py-2 text-left hover:bg-surface">
+                                  <span className="min-w-0 shrink">
+                                    <span className="text-[16px]">{it.name}</span>
+                                    <NutriScore grade={it.nutriscore as string | undefined} />
+                                    <span className="text-[13px] text-muted tnum">
+                                      {' · '}
                                       {n1(it.grams)} {unitOf(it.name)}
-                                      {!e.freeEntry && e.letter ? ` · Plan ${e.letter}` : ''}
-                                    </div>
-                                  </div>
-                                  <span className="text-sm font-bold tnum">{n0(itemMacros(it).kcal)}</span>
+                                      {!e.freeEntry && e.letter ? ` · opción ${e.letter}` : ''}
+                                    </span>
+                                  </span>
+                                  <span className="leader" aria-hidden />
+                                  <span className="shrink-0 font-display text-[19px] font-bold tnum">{n0(itemMacros(it).kcal)}</span>
                                 </button>
                               </motion.li>
                             ) : null,
@@ -236,26 +274,27 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
                         )}
                       </AnimatePresence>
                     </ul>
-                  ) : (
-                    <div className="flex items-center gap-2 px-5 pb-4 pt-1">
-                      <p className="flex-1 text-sm text-faint">Sin anotar</p>
+                  ) : minor ? null : (
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <p className="mr-auto text-sm text-faint">Sin anotar</p>
                       {hasYesterday && (
-                        <button onClick={() => copyFromYesterday(slot)} className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1.5 text-xs font-bold text-muted hover:text-ink">
+                        <button onClick={() => copyFromYesterday(slot)} className="inline-flex items-center gap-1.5 rounded-full border-2 border-line px-3 py-1 text-[13px] font-semibold text-muted hover:border-rule hover:text-ink">
                           <Copy className="size-3.5" /> Repetir ayer
                         </button>
                       )}
                       {planFoods.length > 0 && (
-                        <button onClick={goPlan} className="rounded-full bg-brand-soft px-3 py-1.5 text-xs font-bold text-brand">
+                        <button onClick={goPlan} className="rounded-full border-2 border-rule px-3 py-1 text-[13px] font-semibold">
                           Ver mi plan
                         </button>
                       )}
                     </div>
                   )}
-                </Card>
+                </section>
               );
             })}
           </div>
 
+          <div className="mt-6" />
           <Water ml={d.water} set={(ml) => d.update((s) => ({ ...s, water: ml }))} />
           <ActivityCard
             entry={findActivity(d.entries)}
@@ -271,7 +310,7 @@ export function Today({ plan, uid, name, day, setDay, onError, goPlan }: { plan:
       {/* Botón flotante */}
       <button
         onClick={() => setAdding(slotForNow())}
-        className="fixed bottom-24 right-[max(16px,calc(50%-276px))] z-30 grid size-15 place-items-center rounded-[22px] bg-lime text-[#0f241d] shadow-pop transition-transform active:scale-95"
+        className="fixed bottom-24 right-[max(16px,calc(50%-276px))] z-30 grid size-15 place-items-center rounded-[22px] bg-accent text-on-accent shadow-pop transition-transform active:scale-95"
         aria-label="Añadir alimento"
       >
         <Plus className="size-7" strokeWidth={2.8} />
@@ -333,21 +372,21 @@ function Water({ ml, set }: { ml: number; set: (ml: number) => void }) {
     <Card className="mt-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-2xl bg-water/15 text-water">
+          <span className="grid size-10 place-items-center rounded-[12px] bg-water/15 text-water">
             <Droplets className="size-5" />
           </span>
           <div>
-            <h2 className="font-display text-[17px] font-bold">Agua</h2>
+            <h2 className="caps text-[17px]">Agua</h2>
             <p className="text-xs font-semibold text-muted tnum">
               {(ml / 1000).toLocaleString('es-ES', { maximumFractionDigits: 2 })} L de {(glasses * 0.25).toLocaleString('es-ES')} L
             </p>
           </div>
         </div>
         <div className="flex gap-1.5">
-          <button onClick={() => set(Math.max(0, ml - 250))} disabled={ml <= 0} className="h-9 rounded-xl bg-surface-2 px-3 text-sm font-bold disabled:opacity-40" aria-label="Quitar 250 ml">
+          <button onClick={() => set(Math.max(0, ml - 250))} disabled={ml <= 0} className="h-9 rounded-full border-2 border-line px-3 text-sm font-bold disabled:opacity-40" aria-label="Quitar 250 ml">
             <Minus className="mx-auto size-4" />
           </button>
-          <button onClick={() => set(ml + 250)} className="h-9 rounded-xl bg-water-strong px-3 text-sm font-bold text-white" aria-label="Añadir 250 ml">
+          <button onClick={() => set(ml + 250)} className="caps h-9 rounded-full bg-water-strong px-3.5 text-[15px] text-white" aria-label="Añadir 250 ml">
             + 250 ml
           </button>
         </div>
@@ -369,11 +408,11 @@ function Notes({ value, save }: { value: string; save: (t: string) => void }) {
   return (
     <Card className="mt-3">
       <div className="mb-3 flex items-center gap-3">
-        <span className="grid size-10 place-items-center rounded-2xl bg-brand-soft text-brand">
+        <span className="grid size-10 place-items-center rounded-[12px] bg-brand-soft text-brand">
           <MessageSquareText className="size-5" />
         </span>
         <div>
-          <h2 className="font-display text-[17px] font-bold">Nota para tu coach</h2>
+          <h2 className="caps text-[17px]">Nota para tu coach</h2>
           <p className="text-xs text-muted">Hambre, sensaciones, entreno, dudas…</p>
         </div>
       </div>

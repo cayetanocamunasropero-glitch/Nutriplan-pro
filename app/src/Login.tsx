@@ -58,15 +58,14 @@ export function Login() {
   }
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-brand text-white dark:bg-[#0d2a20]">
-      <div className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full bg-lime/25 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -left-20 size-96 rounded-full bg-[#5cc492]/20 blur-3xl" />
-      <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-6 pb-8 pt-14">
+    <div className="relative min-h-dvh overflow-hidden bg-board text-chalk">
+      <MenuBackdrop />
+      <div className="relative mx-auto flex min-h-dvh max-w-md flex-col px-6 pb-8" style={{ paddingTop: 'max(48px, calc(env(safe-area-inset-top) + 32px))' }}>
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-3">
           <Logo size={44} />
           <div>
-            <div className="font-display text-xl font-bold leading-none">NutriPlan</div>
-            <div className="mt-1 text-xs text-white/60">Cayetano Camuñas Coach · CYC Fitnes Lab</div>
+            <div className="caps text-[24px] leading-none">NutriPlan</div>
+            <div className="mt-1 text-xs text-chalk-dim">Cayetano Camuñas Coach · CYC Fitness Lab</div>
           </div>
         </motion.div>
 
@@ -74,25 +73,29 @@ export function Login() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.08 }}
-          className="mt-14 font-display text-[44px] font-extrabold leading-[0.98] tracking-tight"
+          className="caps mt-12 text-[58px] leading-[0.9]"
         >
-          Tu plan.
+          Tu menú.
           <br />
           Tu ritmo.
           <br />
-          <span className="text-lime">Tus resultados.</span>
+          <span className="text-accent">Tus resultados.</span>
         </motion.h1>
-        <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-white/70">Registra lo que comes en segundos y mantén a tu coach al día sin mensajes ni capturas.</p>
+        <p className="mt-6 flex max-w-sm items-baseline gap-2 whitespace-nowrap text-[16px] text-chalk-dim">
+          <span>Tú lo anotas</span>
+          <span className="min-w-6 flex-1 -translate-y-1 border-b-2 border-dotted border-chalk-dim/60" aria-hidden />
+          <span className="font-semibold text-chalk">tu coach lo ve al momento</span>
+        </p>
 
         <motion.form
           onSubmit={submit}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="mt-auto rounded-[30px] bg-surface p-5 text-ink shadow-pop"
+          className="mt-auto rounded-[16px] bg-surface p-5 text-ink shadow-pop"
         >
           {invited && (
-            <div className="mb-4 rounded-2xl bg-brand-soft px-4 py-3 text-sm text-brand">
+            <div className="mb-4 rounded-[12px] bg-brand-soft px-4 py-3 text-sm text-brand">
               Tienes una invitación de tu coach. <b>Crea tu cuenta</b> y se activará automáticamente.
             </div>
           )}
@@ -154,3 +157,44 @@ export function Login() {
     </div>
   );
 }
+
+// Platos de ejemplo (no son datos de ningún cliente) para el fondo animado.
+const MENU: [string, string, number][] = [
+  ['Desayuno', 'Avena con yogur y plátano', 412],
+  ['Desayuno', 'Tostadas con pavo y aceite', 353],
+  ['Media mañana', 'Fruta y frutos secos', 186],
+  ['Comida', 'Arroz con pollo y verduras', 640],
+  ['Comida', 'Pasta con atún y tomate', 702],
+  ['Comida', 'Lentejas estofadas', 568],
+  ['Merienda', 'Yogur griego con frutos rojos', 214],
+  ['Merienda', 'Bocadillo de jamón', 395],
+  ['Cena', 'Tortilla y ensalada', 380],
+  ['Cena', 'Salmón con patata asada', 610],
+  ['Cena', 'Pizza casera con pechuga', 725],
+  ['Recena', 'Queso fresco batido', 92],
+];
+
+/** Fondo del acceso: un menú del día escrito en tiza que sube despacio. Decorativo y oculto a lectores de pantalla. */
+function MenuBackdrop() {
+  const rows = [...MENU, ...MENU];
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_62%,transparent_88%)]"
+      aria-hidden
+    >
+      <div className="absolute inset-x-6 top-0 animate-crawl motion-reduce:animate-none">
+        {rows.map(([meal, dish, kcal], i) => (
+          <div key={i} className="py-3.5">
+            <div className="caps text-[13px] tracking-[0.12em] text-chalk/10">{meal}</div>
+            <div className="mt-0.5 flex items-baseline gap-2 text-[17px] text-chalk/10">
+              <span className="shrink-0">{dish}</span>
+              <span className="min-w-6 flex-1 -translate-y-1 border-b-2 border-dotted border-chalk/8" />
+              <span className="caps shrink-0 text-[20px] text-accent/20">{kcal}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
