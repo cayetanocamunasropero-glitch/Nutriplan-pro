@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(npx tsc -b --noEmit)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm run test:pdf)",
+      "Bash(npm run test:audit)",
+      "Bash(pkill -f \"vite preview\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "mcp__github__actions_list"
+    ]
+  }
+}
