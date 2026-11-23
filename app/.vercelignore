@@ -1,0 +1,5 @@
+# Lo que no se sube a Vercel al desplegar con la CLI (las capturas de pruebas pueden tener datos de clientes)
+node_modules
+dist
+tests
+.vercel
