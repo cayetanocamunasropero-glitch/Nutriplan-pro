@@ -6,7 +6,8 @@ El repositorio es **público**: nunca subir PDFs de clientes, datos de salud, cl
 ## Estructura
 - `app/` → **NutriPlan 2** (la app nueva). React 19 + TypeScript + Vite + Tailwind v4 + motion. PWA.
   - `src/lib/` datos y lógica: `supabase.ts` (cliente, OWNER, ORIGIN), `data.ts` (todas las consultas), `nutrition.ts` (macros, Harris-Benedict, objetivos), `foods.ts` (biblioteca de 215 alimentos + Open Food Facts vía `/api/foods`), `pdf/` (lector de PDF por tabla, mismo que la versión clásica).
-  - `src/client/` app del cliente: Hoy (anillo kcal, comidas, agua, actividad/pasos, nota, ayuda inicial), Mi plan (opciones A/B/C → «Registrar»), Progreso (kcal 14 días, peso, fotos), Yo (privacidad + descarga de datos); código de WhatsApp, consentimiento RGPD al registrarse y cuestionario inicial.
+  - `src/client/` app del cliente: Hoy (anillo kcal, comidas, agua, actividad/pasos, nota, ayuda inicial), Mi plan (opciones A/B/C → «Registrar»; combinaciones a elegir como wraps/pizzas, «Cambiar» alimento por sus intercambios, «Tu día con estas opciones», «Notas de tu coach»), Progreso (kcal 14 días, peso, fotos), Yo (privacidad + descarga de datos); código de WhatsApp, consentimiento RGPD al registrarse y cuestionario inicial.
+  - `src/lib/plan.ts`: combinaciones (`kit`), intercambios (`choices`) y su formato clásico (`withOriginalFirst`).
   - `src/coach/` panel del coach: lista con alertas y constancia 7 días, detalle por cliente (Resumen, Diario, Plan + importar PDF, Ficha + cálculo de objetivo, Acceso por WhatsApp).
   - `src/ui/` componentes (kit, Sheet, Toast, Charts, back). `window.npBack()` = botón atrás de la APK.
   - `api/foods.js` (Open Food Facts), `api/clasica.js` + `clasica/` → **la versión clásica intacta en `/clasica`** (editor por gramos, generador, alternativas).
@@ -17,6 +18,8 @@ El repositorio es **público**: nunca subir PDFs de clientes, datos de salud, cl
 La app nueva usa **las mismas tablas y formatos** que la clásica; ambas pueden convivir.
 - `nutriplan_private_store.payload` = {clients, foods, plans, templates, …}: se guarda con *leer → modificar → escribir* (`updateStore`) para no pisar cambios hechos desde la clásica.
 - `nutriplan_published_plans.content`: `{groups,target,planType:'alternative-tracker-v1'}` (PDF), `{meals,targets,totals}` (editor clásico) o `{groups:[],target,diaryOnly:true}`. Publicar = PATCH si existe (conserva `client_uid`).
+  - Extras (la clásica los ignora sin romperse): `option.kit = {base, slots:[{id,label,dependsOn?,at?,choices:[{id,label,items|by}]}]}` (wraps: relleno × queso × salsa; pizzas: queso), y `option.items` guarda la combinación por defecto. `item.choices` = intercambios **empezando por el propio alimento** (convención de la clásica) + `alternativesText`; `item.portion` = nota de ración en texto; `content.coachNotes = [{title, lines}]`.
+  - Lector de PDF «menú»: además de opciones, lee la tabla de wraps (despeja con sus totales lo que falte), quesos alternativos, intercambios de hidratos (si el PDF los calcula para otros gramos, los recalcula con los mismos hidratos y lo avisa), variantes «A -> B 65 g» y guía/reglas/día de ejemplo.
 - `nutriplan_meal_logs.entries`: entradas libres `{id,freeEntry:true,meal:'Libre:<id>',mealSlot,letter:'Libre',status,items}`; del plan `{meal:<grupo>,letter,status,items}`; `kind:'activity'` se conserva sin tocar. Items con kcal/c/p/f **por 100 g**.
 - `nutriplan_invitations` (hash SHA-256 del código NP-…, 7 días) + RPC `nutriplan_claim_invitation(p_code)`.
 - `nutriplan_client_onboarding` / `nutriplan_client_health_private`, `nutriplan_weight_entries`, `nutriplan_progress_photos` + bucket `nutriplan-client-progress-private`.

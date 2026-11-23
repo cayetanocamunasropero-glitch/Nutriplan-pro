@@ -25,7 +25,20 @@ export function seed({ linked = true } = {}) {
       name: 'Comida',
       share: 40,
       options: [
-        { letter: 'A', title: 'Arroz con pollo', items: [{ name: 'Arroz blanco crudo', grams: 90, kcal: 360, c: 79, p: 7, f: 0.6 }, { name: 'Pechuga de pollo', grams: 160, kcal: 110, c: 0, p: 23, f: 1.5, choices: [{ name: 'Pechuga de pollo', grams: 160, kcal: 110, c: 0, p: 23, f: 1.5 }, { name: 'Lomo de cerdo', grams: 150, kcal: 150, c: 0, p: 21, f: 7 }] }] },
+        { letter: 'A', title: 'Arroz con pollo', items: [{ name: 'Arroz blanco crudo', grams: 90, kcal: 360, c: 79, p: 7, f: 0.6, portion: 'pesar en crudo', choices: [{ name: 'Arroz blanco crudo', grams: 90, kcal: 360, c: 79, p: 7, f: 0.6 }, { name: 'Pasta seca cruda', grams: 95, kcal: 356, c: 72, p: 12.5, f: 1.5 }], alternativesText: 'Pasta seca cruda 95 g' }, { name: 'Pechuga de pollo', grams: 160, kcal: 110, c: 0, p: 23, f: 1.5, choices: [{ name: 'Pechuga de pollo', grams: 160, kcal: 110, c: 0, p: 23, f: 1.5 }, { name: 'Lomo de cerdo', grams: 150, kcal: 150, c: 0, p: 21, f: 7 }] }] },
+        // Opción que se arma eligiendo (como los wraps de los PDF): `items` guarda la combinación por defecto
+        {
+          letter: 'B',
+          title: 'Wraps a elegir',
+          kit: {
+            base: [{ name: 'Tortilla de trigo', grams: 120, kcal: 300, c: 50, p: 8, f: 7 }],
+            slots: [
+              { id: 'relleno', label: 'Relleno', choices: [{ id: 'pollo', label: 'Pollo', items: [{ name: 'Pechuga de pollo', grams: 150, kcal: 110, c: 0, p: 23, f: 1.5 }] }, { id: 'atun', label: 'Atún', items: [{ name: 'Atún al natural', grams: 120, kcal: 100, c: 0, p: 23, f: 1 }] }] },
+              { id: 'salsa', label: 'Salsa', choices: [{ id: 'bbq', label: 'BBQ 30 g', items: [{ name: 'Salsa barbacoa', grams: 30, kcal: 150, c: 35, p: 1, f: 0 }] }, { id: 'yogur', label: 'Yogur 50 g', items: [{ name: 'Salsa de yogur', grams: 50, kcal: 90, c: 5, p: 3, f: 6 }] }] },
+            ],
+          },
+          items: [{ name: 'Tortilla de trigo', grams: 120, kcal: 300, c: 50, p: 8, f: 7 }, { name: 'Pechuga de pollo', grams: 150, kcal: 110, c: 0, p: 23, f: 1.5 }, { name: 'Salsa barbacoa', grams: 30, kcal: 150, c: 35, p: 1, f: 0 }],
+        },
       ],
     },
     { name: 'Cena', share: 25, options: [{ letter: 'A', title: 'Tortilla y ensalada', items: [{ name: 'Huevo', grams: 120, kcal: 143, c: 0.7, p: 12.6, f: 9.5 }, { name: 'Ensalada verde', grams: 150, kcal: 20, c: 3, p: 1.3, f: 0.2 }] }] },
@@ -67,7 +80,7 @@ export function seed({ linked = true } = {}) {
       },
     ],
     nutriplan_published_plans: [
-      { client_id: clientId, owner_id: OWNER, client_uid: linked ? CLIENT_UID : null, client_name: 'Mario Prueba', content: { title: 'Plan noviembre', groups, target: { kcal: 2300, c: 260, p: 170, f: 64 }, planType: 'alternative-tracker-v1' }, published_at: new Date().toISOString() },
+      { client_id: clientId, owner_id: OWNER, client_uid: linked ? CLIENT_UID : null, client_name: 'Mario Prueba', content: { title: 'Plan noviembre', groups, target: { kcal: 2300, c: 260, p: 170, f: 64 }, planType: 'alternative-tracker-v1', coachNotes: [{ title: 'Reglas de productos', lines: ['Arroz siempre pesado en crudo.', 'Salsas: nunca más de 30 g.'] }] }, published_at: new Date().toISOString() },
       { client_id: 'c-laura', owner_id: OWNER, client_uid: 'laura-uid', client_name: 'Laura Martín', content: { groups: [], target: { kcal: 1900, c: 237, p: 119, f: 53 }, diaryOnly: true }, published_at: new Date().toISOString() },
     ],
     nutriplan_meal_logs: logs,
