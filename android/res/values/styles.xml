@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pizarra de NutriPlan: sin barra de título, barras del sistema del color de la cabecera -->
+    <style name="Theme.NutriPlan" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/board</item>
+        <item name="android:statusBarColor">@color/board</item>
+        <item name="android:navigationBarColor">@color/board</item>
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
+</resources>

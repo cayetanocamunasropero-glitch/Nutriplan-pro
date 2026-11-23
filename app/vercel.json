@@ -5,6 +5,7 @@
   "rewrites": [{ "source": "/clasica", "destination": "/api/clasica" }],
   "functions": { "api/clasica.js": { "includeFiles": "clasica/**" } },
   "headers": [
+    { "source": "/NutriPlan.apk", "headers": [{ "key": "Content-Type", "value": "application/vnd.android.package-archive" }, { "key": "Content-Disposition", "value": "attachment; filename=\"NutriPlan.apk\"" }, { "key": "Cache-Control", "value": "no-cache" }] },
     { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }, { "key": "Service-Worker-Allowed", "value": "/" }] },
     { "source": "/manifest.webmanifest", "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }] },
     { "source": "/", "headers": [{ "key": "Access-Control-Allow-Origin", "value": "*" }, { "key": "Cache-Control", "value": "no-cache" }] },

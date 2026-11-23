@@ -32,7 +32,13 @@ La app nueva usa **las mismas tablas y formatos** que la clásica; ambas pueden 
 - `npm run test:audit` → detector de Impeccable sobre cada pantalla renderizada (contraste, tamaños, títulos…). Objetivo: 0 hallazgos.
 
 ## APK
-La APK (`legacy/apk/index.html`) descarga la web de producción con `fetch` y la escribe con `document.write` desde `file://`. La app nueva es compatible (probado): sin rutas por URL, `ORIGIN`/`NP_ORIGIN` para llamadas a `/api`, CORS en assets, `window.npBack`. Las mejoras llegan sin reinstalar.
+La APK descarga la web de producción con `fetch` y la escribe con `document.write` desde `file://`. La app nueva es compatible (probado): sin rutas por URL, `ORIGIN`/`NP_ORIGIN` para llamadas a `/api`, CORS en assets, `window.npBack`. Las mejoras llegan sin reinstalar.
+- **APK nueva (nov 2026): `android/`**
+  - Paquete `com.cycfitnesslab.nutriplan`, con el look actual. Ver `android/README.md`.
+  - Se compila con `android/build.sh` (herramientas de apt, sin Android Studio).
+  - Descargable en `/NutriPlan.apk` (`app/public/NutriPlan.apk`).
+  - La clave de firma la guarda Cayetano: nunca en el repositorio.
+- APK antigua: `legacy/apk/` (`com.cyc.nutriplan`, otra clave). Sigue funcionando porque carga la misma web.
 
 ## Despliegue
 - **GitHub Pages** (vista previa): `.github/workflows/pages.yml` publica `app/dist` en cada push a `main` o a la rama de trabajo → `https://cayetanocamunasropero-glitch.github.io/Nutriplan-pro/`. Requiere Settings → Pages → Source «GitHub Actions». Sin servidor: el buscador llama directo a Open Food Facts y `/clasica` no existe allí.

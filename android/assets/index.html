@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17231D">
+<title>NutriPlan</title>
+<style>
+html,body{margin:0;height:100%;background:#17231D;color:#F0ECE0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.s{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;box-sizing:border-box}
+.l{width:84px;height:84px;border-radius:26px;background:#22342B;display:grid;place-items:center}
+.l svg{width:54px;height:54px}
+h1{margin:0;font-size:30px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
+p{margin:0;color:#B9BFB4;max-width:320px;line-height:1.5;font-size:15px}
+.b{width:26px;height:26px;border-radius:50%;border:3px solid #22342B;border-top-color:#E8B638;animation:r .9s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.b{animation-duration:2.4s}}
+button{border:0;border-radius:999px;background:#E8B638;color:#17231D;font-size:16px;font-weight:800;padding:13px 26px;text-transform:uppercase;letter-spacing:.03em}
+.h{display:none}
+</style>
+</head>
+<body>
+<div class="s">
+ <div class="l"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 18c0-6.6 4.6-12 12-12h8v8c0 7.4-5.4 12-12 12H6v-8Z" fill="#E8B638"/><path d="M8 24 19 13" stroke="#22342B" stroke-width="2.6" stroke-linecap="round"/></svg></div>
+ <h1>NutriPlan</h1>
+ <div class="b" id="spin"></div>
+ <p id="msg">Cargando la última versión…</p>
+ <button id="retry" class="h" type="button">Reintentar</button>
+</div>
+<script>
+// Descarga la app web de producción y la escribe aquí: así cada mejora llega sin reinstalar la APK.
+// Si no hay conexión, usa la última copia guardada.
+(function(){
+ var ORIGIN='https://nutriplan-asesoria.vercel.app';
+ var KEY='np-shell-html';
+ function inject(html){
+  var head='<base href="'+ORIGIN+'/"><script>window.NP_ORIGIN="'+ORIGIN+'";window.NP_APP="android";<\/script>';
+  return /<head[^>]*>/i.test(html)?html.replace(/<head[^>]*>/i,function(m){return m+head}):head+html;
+ }
+ function show(html){document.open();document.write(inject(html));document.close()}
+ function fail(text){
+  document.getElementById('spin').className='h';
+  document.getElementById('msg').textContent=text;
+  var b=document.getElementById('retry');b.className='';b.onclick=function(){location.reload()};
+ }
+ var done=false,cached=null;
+ try{cached=localStorage.getItem(KEY)}catch(e){}
+ var timer=setTimeout(function(){if(!done&&cached){done=true;show(cached)}},9000);
+ fetch(ORIGIN+'/?app=android&t='+Date.now(),{cache:'no-store'}).then(function(r){
+  if(!r.ok)throw Error('HTTP '+r.status);return r.text();
+ }).then(function(html){
+  if(!/NutriPlan/.test(html))throw Error('respuesta no válida');
+  try{localStorage.setItem(KEY,html)}catch(e){}
+  if(!done){done=true;clearTimeout(timer);show(html)}
+ }).catch(function(){
+  if(done)return;done=true;clearTimeout(timer);
+  if(cached)show(cached);else fail('No hay conexión a internet. NutriPlan necesita conexión la primera vez que se abre.');
+ });
+})();
+</script>
+</body>
+</html>

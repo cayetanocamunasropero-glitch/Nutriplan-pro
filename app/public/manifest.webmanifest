@@ -8,8 +8,8 @@
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
- "background_color": "#f3f2ec",
- "theme_color": "#1e5b49",
+ "background_color": "#17231d",
+ "theme_color": "#17231d",
  "categories": [
   "health",
   "fitness",
@@ -23,16 +23,22 @@
    "purpose": "any"
   },
   {
-   "src": "./icons/icon.svg",
-   "sizes": "any",
-   "type": "image/svg+xml",
+   "src": "./icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
    "purpose": "any"
+  },
+  {
+   "src": "./icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
   },
   {
    "src": "./icons/icon.svg",
    "sizes": "any",
    "type": "image/svg+xml",
-   "purpose": "maskable"
+   "purpose": "any"
   }
  ]
 }
