@@ -72,3 +72,10 @@ Para la app (es una app, no una landing):
 
 ## Preferencias de Cayetano
 Trabajo iterativo y dirigido; conservar lo que ya funciona; no confundir apps por nombres parecidos; que los clientes no tengan que reinstalar.
+
+## Presentaciones y posts (contenido de redes de Cayetano, no la app)
+- Marca: logo CYC = matraz con líquido lima. Paleta: negro `#0B0C0E` / grafito `#16181D`, texto `#F2F2EE`, acento lima `#C6FF00` (texto oscuro sobre lima). Tipos: Oswald (títulos en mayúsculas) + Rubik.
+- Mascota: el matraz del logo en 3D (cristal con brillos, líquido lima con burbujas, ojos esféricos, brazos/piernas de tubo, mancuerna con discos lima, sombra).
+- Estructura: storytelling (gancho, problema, insight, solución, conclusión); 8–10 diapositivas; citar estudios sin inventar cifras.
+- Rutinas: figuras de cuerpo por día con los músculos trabajados en lima (frente; Pull/Posterior de espaldas), descanso = «Zz».
+- **Próximos sliders (petición de Cayetano):** formato cuadrado para Instagram (1080×1080 o 4:5 1080×1350), con imágenes animadas en **bucle perfecto de 4–5 s**: el último fotograma coincide con el primero (apertura y cierre perfectos) para que no se note cuándo se repite. Entregar también como vídeo MP4 en bucle.
