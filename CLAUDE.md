@@ -79,3 +79,9 @@ Trabajo iterativo y dirigido; conservar lo que ya funciona; no confundir apps po
 - Estructura: storytelling (gancho, problema, insight, solución, conclusión); 8–10 diapositivas; citar estudios sin inventar cifras.
 - Rutinas: figuras de cuerpo por día con los músculos trabajados en lima (frente; Pull/Posterior de espaldas), descanso = «Zz».
 - **Próximos sliders (petición de Cayetano):** formato cuadrado para Instagram (1080×1080 o 4:5 1080×1350), con imágenes animadas en **bucle perfecto de 4–5 s**: el último fotograma coincide con el primero (apertura y cierre perfectos) para que no se note cuándo se repite. Entregar también como vídeo MP4 en bucle.
+- **Estilos visuales a elegir** (referencias de Instagram de Cayetano; Claude no puede abrir Instagram desde aquí: pedir capturas de la referencia elegida antes de diseñar):
+  - *Serio y profesional:* instagram.com/p/DgFk1pQJVxj · /p/Df5MczvGEbO · /p/Dfc7cX6m4uz
+  - *Vistoso y que enganche:* /p/Df2pZroH8ZJ · /p/Dfj9jchm7R5
+  - *Limpio, estético y minimalista:* /p/DfUNzqPlaIF · /p/DW1th4LCEGC · /p/DfY3J3plY3V
+  - *Animado, cartoon, con personajes:* /p/Dfj-MgEG2cg · /p/DgI4ShfIORy · /p/Dfzd5bFm8xd
+  - Antes de cada slider, preguntar qué estilo quiere.
