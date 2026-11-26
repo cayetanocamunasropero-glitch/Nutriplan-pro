@@ -72,15 +72,3 @@ Para la app (es una app, no una landing):
 
 ## Preferencias de Cayetano
 Trabajo iterativo y dirigido; conservar lo que ya funciona; no confundir apps por nombres parecidos; que los clientes no tengan que reinstalar.
-
-## Vídeos (plugin Lemo-Opuscar, `lemomo-ai/lemo-opuscar`)
-- Cuando Cayetano pida un vídeo (promo, explicativo, reel…), **antes de producir nada ofrécele 3-4 estilos del catálogo adaptados a su idea**: nombre del estilo, por qué encaja y cómo quedaría su idea en él. Que elija (o mezcle/ajuste) y luego seguir el skill `lemo-opuscar`.
-- No está instalado de forma permanente (decisión de Cayetano): si el skill no aparece, instalarlo en ese momento con `claude plugin marketplace add lemomo-ai/lemo-opuscar && claude plugin install lemo-opuscar@lemolab`. No activarlo en `.claude/settings.json`.
-- Catálogo: `~/lemo-opuscar/styles/README.md` (99 estilos) o la galería `lemomo-ai.github.io/lemo-opuscar/`. Trabajar con esfuerzo alto (`/effort high`).
-- Los vídeos se hacen fuera de `app/` y **no se suben al repo** (es público): entregarlos como archivo, salvo que pida lo contrario.
-
-## FreeLLMAPI (freellmapi.co) — solo para pruebas personales
-Router de código abierto (`tashfeenahmed/freellmapi`) que une los niveles gratuitos de ~30 proveedores de IA en un endpoint compatible con OpenAI/Anthropic. Decisión (nov 2026): **no instalarlo en las sesiones ni en el repo**.
-- Nunca en NutriPlan (clientes reales, datos de salud, RGPD): los niveles gratuitos no garantizan privacidad ni estabilidad. Para IA en la app, API de pago con contrato de tratamiento de datos.
-- No redirigir Claude Code a través de él. Sus claves de proveedores, nunca en el repo.
-- Si Cayetano quiere probar modelos gratis, darle los pasos para instalarlo en su propio ordenador.
