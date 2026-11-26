@@ -84,8 +84,3 @@ Router de código abierto (`tashfeenahmed/freellmapi`) que une los niveles gratu
 - Nunca en NutriPlan (clientes reales, datos de salud, RGPD): los niveles gratuitos no garantizan privacidad ni estabilidad. Para IA en la app, API de pago con contrato de tratamiento de datos.
 - No redirigir Claude Code a través de él. Sus claves de proveedores, nunca en el repo.
 - Si Cayetano quiere probar modelos gratis, darle los pasos para instalarlo en su propio ordenador.
-
-## Ponytail (`DietrichGebert/ponytail`, ponytail.dev)
-Plugin de Claude Code «senior perezoso»: la solución más simple y corta que funcione (YAGNI, biblioteca estándar primero, sin abstracciones no pedidas). Comandos: `/ponytail` (modos lite/full/ultra/off), `/ponytail-review` (sobreingeniería en un cambio), `/ponytail-audit` (repo), `/ponytail-debt` (atajos marcados `ponytail:` en el código).
-- No se activa por `.claude/settings.json` (mismo criterio que Lemo-Opuscar). Si Cayetano lo quiere en una sesión: `claude plugin marketplace add DietrichGebert/ponytail && claude plugin install ponytail@ponytail`.
-- Dejar `webhookUrl` vacío (así no sale nada del equipo). Lo simple nunca a costa de lo que ya funciona: compatibilidad con la clásica y la APK, RGPD, accesibilidad y las pruebas e2e.
